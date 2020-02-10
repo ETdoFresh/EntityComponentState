@@ -61,6 +61,12 @@ namespace ConsoleApp1
                 ConsoleWriteState(state3);
                 ConsoleWriteState(state4);
 
+                var deltaState1 = new DeltaState(state1, state2);
+                var deltaState2 = new DeltaState(state2, state3);
+                var deltaState3 = new DeltaState(state3, state4);
+                var deltaState4 = new DeltaState(state1, state4);
+
+
                 Console.WriteLine($"Time to create and show state: {stopwatch.Elapsed.TotalMilliseconds}");
 
                 input = Console.ReadKey().KeyChar.ToString().ToLower();
@@ -70,7 +76,7 @@ namespace ConsoleApp1
         private static void ConsoleWriteState(State state)
         {
             Console.WriteLine(state);
-            Console.WriteLine($"Bytes: {state.ToBytes()}");
+            Console.WriteLine($"Bytes: {state.ToByteHexString()}");
         }
 
     }

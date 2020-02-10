@@ -53,5 +53,15 @@ namespace ConsoleApp1
         {
             return $"Entity ID: {entity.id} [X: {X}, Y: {Y}, Z: {Z}, W: {W}]";
         }
+
+        public override string ToByteHexString()
+        {
+            var output = base.ToByteHexString();
+            output += $" {X.ToByteHexString()}";
+            output += $" {Y.ToByteHexString()}";
+            output += $" {Z.ToByteHexString()}";
+            output += $" {W.ToByteHexString()}";
+            return output;
+        }
     }
 }

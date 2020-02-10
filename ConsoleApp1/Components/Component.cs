@@ -32,5 +32,10 @@
         {
             return entity.id;
         }
+
+        public virtual string ToByteHexString()
+        {
+            return entity.id.ToByteHexString();
+        }
     }
 }

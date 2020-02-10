@@ -13,5 +13,12 @@ namespace ConsoleApp1
             newComponent.spriteName = spriteName;
             return newComponent;
         }
+
+        public override string ToByteHexString()
+        {
+            var output = base.ToByteHexString();
+            output += $" {spriteName.ToByteHexString()}";
+            return output;
+        }
     }
 }

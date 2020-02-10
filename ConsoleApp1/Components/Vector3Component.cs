@@ -23,7 +23,7 @@ namespace ConsoleApp1
         {
             if (base.Equals(obj))
                 if (obj is Vector3Component other)
-                    if (this.value == other.value) 
+                    if (this.value == other.value)
                         return true;
 
             return false;
@@ -47,9 +47,18 @@ namespace ConsoleApp1
             return !(lhs == rhs);
         }
 
-    public override string ToString()
+        public override string ToString()
         {
             return $"Entity ID: {entity.id} [X: {X}, Y: {Y}, Z: {Z}]";
+        }
+
+        public override string ToByteHexString()
+        {
+            var output = base.ToByteHexString();
+            output += $" {X.ToByteHexString()}";
+            output += $" {Y.ToByteHexString()}";
+            output += $" {Z.ToByteHexString()}";
+            return output;
         }
     }
 }

@@ -13,5 +13,12 @@ namespace ConsoleApp1
             newComponent.frame = frame;
             return newComponent;
         }
+
+        public override string ToByteHexString()
+        {
+            var output = base.ToByteHexString();
+            output += $" {frame.ToByteHexString()}";
+            return output;
+        }
     }
 }
