@@ -9,6 +9,7 @@ namespace ConsoleApp1
         public override Component Clone()
         {
             var newComponent = Activator.CreateInstance(GetType()) as Sprite;
+            newComponent.entity = entity;
             newComponent.spriteName = spriteName;
             return newComponent;
         }

@@ -13,11 +13,40 @@ namespace ConsoleApp1
         public override Component Clone()
         {
             var newComponent = Activator.CreateInstance(GetType()) as Vector4Component;
+            newComponent.entity = entity;
             newComponent.X = X;
             newComponent.Y = Y;
             newComponent.Z = Z;
             newComponent.W = W;
             return newComponent;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (base.Equals(obj))
+                if (obj is Vector4Component other)
+                    if (this.value == other.value)
+                        return true;
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return value.GetHashCode();
+        }
+
+        public static bool operator ==(Vector4Component lhs, Vector4Component rhs)
+        {
+            if (lhs is null)
+                return rhs is null;
+            else
+                return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(Vector4Component lhs, Vector4Component rhs)
+        {
+            return !(lhs == rhs);
         }
 
         public override string ToString()

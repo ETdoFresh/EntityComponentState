@@ -9,6 +9,7 @@ namespace ConsoleApp1
         public override Component Clone()
         {
             var newComponent = Activator.CreateInstance(GetType()) as AnimationFrame;
+            newComponent.entity = entity;
             newComponent.frame = frame;
             return newComponent;
         }

@@ -8,7 +8,7 @@ namespace ConsoleApp1
     {
         public static State state = new State();
 
-        static void Main(string[] args)
+        static void Main()
         {
             var allEntities = new List<Entity>();
             var stopwatch = new Stopwatch();
@@ -16,19 +16,6 @@ namespace ConsoleApp1
             var input = Console.ReadKey().KeyChar.ToString().ToLower();
             while (input != "q")
             {
-                //if (input == "1")
-                //    state.spaceShips.Add(new SpaceShip());
-                //else if (input == "2")
-                //    state.asteroids.Add(new Asteroid());
-                //else if (input == "3")
-                //    state.bullets.Add(new Bullet());
-                //else if (input == "4")
-                //    if (state.spaceShips.Count > 0) { state.spaceShips.RemoveAt(0); } else { }
-                //else if (input == "5")
-                //    if (state.asteroids.Count > 0) { state.asteroids.RemoveAt(0); } else { }
-                //else if (input == "6")
-                //    if (state.bullets.Count > 0) { state.bullets.RemoveAt(0); } else { }
-
                 foreach (var entity in allEntities)
                     entity.Destroy();
 

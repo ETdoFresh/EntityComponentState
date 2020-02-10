@@ -31,9 +31,12 @@ namespace ConsoleApp1
 
         public void AddComponents(params Component[] components)
         {
+            if (components == null)
+                throw new ArgumentNullException("Cannot Entity.AddComponents(null)");
+
             foreach (var component in components)
                 if (component == null)
-                    throw new ArgumentNullException("Cannot AddComponent Null");
+                    throw new ArgumentNullException("Cannot Entity.AddComponents(...,null,...)");
 
             this.components.AddRange(components);
             foreach (var component in components)
@@ -52,7 +55,53 @@ namespace ConsoleApp1
 
         public T GetComponent<T>() where T : Component
         {
-            return components.Where(c => c is T).FirstOrDefault() as T;
+            return (T)components.Where(c => c is T).FirstOrDefault();
+        }
+
+        public bool HasComponent(Type type)
+        {
+            return components.Any(c => type.IsAssignableFrom(c.GetType()));
+        }
+
+        public Component GetComponent(Type type)
+        {
+            return components.Where(c => type.IsAssignableFrom(c.GetType())).FirstOrDefault();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null)
+                return false;
+
+            if (obj is Entity other)
+            {
+                if (this.id != other.id) return false;
+                foreach (var component in components)
+                    if (!other.HasComponent(component.GetType()))
+                        return false;
+                    else if (other.GetComponent(component.GetType()) != component)
+                        return false;
+                return true;
+            }
+            return false;
+        }
+
+        public static bool operator ==(Entity lhs, Entity rhs)
+        {
+            if (lhs is null)
+                return rhs is null;
+            else
+                return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(Entity lhs, Entity rhs)
+        {
+            return !(lhs == rhs);
+        }
+
+        public override int GetHashCode()
+        {
+            return id;
         }
     }
 }
