@@ -64,6 +64,58 @@ namespace ConsoleApp1
             despawns.AddRange(removedEntities);
         }
 
+        public override string ToString()
+        {
+            var output = $"State [Start Tick: {startState.tick} Target Tick: {targetState.tick}]\r\n";
+            foreach (var componentType in State.componentTypes)
+            {
+                var componentChanges = changes.Where(change => change.componentType == componentType);
+                output += $"  {componentType.Name} [Count: {componentChanges.Count()}]\r\n";
+                foreach (var component in componentChanges.Select(change => change.delta))
+                    if (component is null)
+                        output += $"    SKIP\r\n";
+                    else
+                        output += $"    {component}\r\n";
+            }
+
+            return output;
+        }
+
+        public string ToByteHexString()
+        {
+            var output = "";
+            output += startState.tick.ToByteHexString();
+            output += $" {targetState.tick.ToByteHexString()}";
+
+            foreach (var componentType in State.componentTypes)
+            {
+                var componentChanges = changes.Where(change => change.componentType == componentType);
+
+                var i = 0;
+                var skip = 0;
+                while (i < componentChanges.Count())
+                {
+                    var delta = componentChanges.ElementAt(i).delta;
+                    if (delta is null)
+                    {
+                        i++;
+                        skip++;
+                    }
+                    else
+                    {
+                        output += $" {skip.ToByteHexString()}";
+                        output += $" {delta.ToByteHexString()}";
+                        i++;
+                        skip = 0;
+                    }
+                }
+                if (skip > 0)
+                    output += $" {skip.ToByteHexString()}";
+            }
+            var count = output.Replace(" ", "").Length / 2;
+            return $"{output} [{count}]";
+        }
+
         public class Change
         {
             public int entityId;

@@ -42,19 +42,19 @@ namespace ConsoleApp1
 
                 var entities = new List<Entity> { ship, asteroid1, asteroid2 };
 
-                var state1 = State.Create(entities);
+                var state1 = State.Create(1, entities);
 
                 entities.Add(asteroid3);
 
-                var state2 = State.Create(entities);
+                var state2 = State.Create(2, entities);
 
                 entities.Remove(asteroid2);
 
-                var state3 = State.Create(entities);
+                var state3 = State.Create(3, entities);
 
                 entities.Add(bullet);
 
-                var state4 = State.Create(entities);
+                var state4 = State.Create(4, entities);
 
                 ConsoleWriteState(state1);
                 ConsoleWriteState(state2);
@@ -66,6 +66,10 @@ namespace ConsoleApp1
                 var deltaState3 = new DeltaState(state3, state4);
                 var deltaState4 = new DeltaState(state1, state4);
 
+                ConsoleWriteState(deltaState1);
+                ConsoleWriteState(deltaState2);
+                ConsoleWriteState(deltaState3);
+                ConsoleWriteState(deltaState4);
 
                 Console.WriteLine($"Time to create and show state: {stopwatch.Elapsed.TotalMilliseconds}");
 
@@ -79,5 +83,10 @@ namespace ConsoleApp1
             Console.WriteLine($"Bytes: {state.ToByteHexString()}");
         }
 
+        private static void ConsoleWriteState(DeltaState deltaState)
+        {
+            Console.WriteLine(deltaState);
+            Console.WriteLine($"Bytes: {deltaState.ToByteHexString()}");
+        }
     }
 }

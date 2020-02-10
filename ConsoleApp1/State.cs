@@ -17,9 +17,10 @@ namespace ConsoleApp1
         public int tick;
         public List<Entity> entities = new List<Entity>();
 
-        public static State Create(List<Entity> entities)
+        public static State Create(int tick, List<Entity> entities)
         {
             var newState = new State();
+            newState.tick = tick;
             foreach (var entity in entities.OrderBy(e => e.id))
                 newState.entities.Add(entity.Clone());
             return newState;
