@@ -6,67 +6,66 @@ namespace ConsoleApp1
 {
     public class DeltaState
     {
-        public State startState;
-        public State targetState;
-        public IEnumerable<Entity> currentEntities;
+        public int startTick;
+        public int endTick;
+        public IEnumerable<Entity> entities;
         public List<Entity> spawns = new List<Entity>();
         public List<Change> changes = new List<Change>();
         public List<Entity> despawns = new List<Entity>();
 
-        public DeltaState(State startState, State targetState)
+        public DeltaState(State startState, State endState)
         {
-            this.startState = startState;
-            this.targetState = targetState;
+            this.startTick = startState.tick;
+            this.endTick = endState.tick;
+            var startEntities = startState.entities;
+            var endEntities = endState.entities;
 
-            AddSpawns();
-            AddUpdates();
-            AddDespawns();
+            var addedEntities = endEntities.Where(endEntity => !startEntities.Any(startEntity => startEntity.id == endEntity.id));
+            var removedEntities = startEntities.Where(startEntity => !endEntities.Any(endEntity => startEntity.id == endEntity.id));
+
+            entities = startEntities.Union(addedEntities);
+            spawns.AddRange(addedEntities);
+            despawns.AddRange(removedEntities);
+            AddUpdates(startEntities, endEntities);
         }
 
-        private void AddSpawns()
-        {
-            var continuingEntities = targetState.entities.Where(targetEntity => startState.entities.Any(startEntity => startEntity.id == targetEntity.id));
-            var newEntities = targetState.entities.Except(continuingEntities);
-            spawns.AddRange(newEntities);
-            currentEntities = startState.entities.Union(spawns).OrderBy(entity => entity.id);
-        }
-
-        private void AddUpdates()
+        // Possibilities
+        
+        // State Empty  Removed? (Skip?)
+        private void AddUpdates(List<Entity> startEntities, List<Entity> endEntities)
         {
             foreach (var componentType in State.componentTypes)
-                foreach (var entity in currentEntities)
+                foreach (var entity in entities)
                 {
                     var change = new Change { componentType = componentType, entityId = entity.id };
-                    var targetEntity = targetState.entities.Where(targetEntity => targetEntity.id == entity.id).FirstOrDefault();
-                    if (!startState.entities.Contains(entity))
+                    if (!startEntities.Contains(entity)) 
                     {
                         if (entity.HasComponent(componentType))
                         {
+                            // Start State Empty --> End State Has Values == Change!
                             change.delta = entity.GetComponent(componentType);
                         }
+                        // Start State Empty --> End State Empty == No Change!  (Skip)
                     }
-                    else if (targetEntity != null)
+                    else if (endEntities.Any(endEntity => endEntity.id == entity.id))
                     {
-                        if (entity.GetComponent(componentType) != targetEntity.GetComponent(componentType))
+                        var endEntity = endEntities.Where(endEntity => endEntity.id == entity.id).FirstOrDefault();
+                        if (entity.GetComponent(componentType) != endEntity.GetComponent(componentType))
                         {
-                            change.delta = targetEntity.GetComponent(componentType);
+                            // Start State Has Values --> End State Has Different Values == Change!
+                            change.delta = endEntity.GetComponent(componentType);
                         }
+                        // Start State Has Values --> End State Has Same Values == No Change! (Skip)
                     }
-                    // Otherwise delta == null aka Skip
+                    // Start State Has Value --> End State Empty == Iffy Skip?
+                    // Otherwise Skip
                     changes.Add(change);
                 }
         }
 
-        private void AddDespawns()
-        {
-            var continuingEntities = targetState.entities.Where(targetEntity => startState.entities.Any(startEntity => startEntity.id == targetEntity.id));
-            var removedEntities = startState.entities.Except(continuingEntities);
-            despawns.AddRange(removedEntities);
-        }
-
         public override string ToString()
         {
-            var output = $"State [Start Tick: {startState.tick} Target Tick: {targetState.tick}]\r\n";
+            var output = $"State [Start Tick: {startTick} End Tick: {endTick}]\r\n";
             foreach (var componentType in State.componentTypes)
             {
                 var componentChanges = changes.Where(change => change.componentType == componentType);
@@ -84,8 +83,8 @@ namespace ConsoleApp1
         public string ToByteHexString()
         {
             var output = "";
-            output += startState.tick.ToByteHexString();
-            output += $" {targetState.tick.ToByteHexString()}";
+            output += startTick.ToByteHexString();
+            output += $" {endTick.ToByteHexString()}";
 
             foreach (var componentType in State.componentTypes)
             {
