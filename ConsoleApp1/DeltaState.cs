@@ -29,9 +29,53 @@ namespace ConsoleApp1
             AddUpdates(startEntities, endEntities);
         }
 
-        // Possibilities
-        
-        // State Empty  Removed? (Skip?)
+        public DeltaState(byte[] bytes) 
+        {
+            var byteQueue = new ByteQueue(bytes);
+            startTick = byteQueue.GetInt32();
+            endTick = byteQueue.GetInt32();
+            var entityCount = byteQueue.GetInt32();
+            var entities = new List<Entity>();
+            this.entities = entities;
+            for (int i = 0; i < entityCount; i++)
+                entities.Add(new Entity(byteQueue.GetInt32()));
+
+            var spawnCount = byteQueue.GetInt32();
+            for (int i = 0; i < spawnCount; i++)
+                spawns.Add(entities.Where(entity => entity.id == byteQueue.GetInt32()).First());
+
+            var despawnCount = byteQueue.GetInt32();
+            for (int i = 0; i < despawnCount; i++)
+                despawns.Add(entities.Where(entity => entity.id == byteQueue.GetInt32()).First());
+
+            foreach (var componentType in State.componentTypes)
+            {
+                var currentIndex = 0;
+                while (currentIndex < entityCount)
+                {
+                    var skip = byteQueue.GetInt32();
+                    currentIndex += skip;
+                    if (currentIndex >= entityCount) break;
+
+                    var entity = entities[currentIndex];
+                    var component = (Component)Activator.CreateInstance(componentType);
+                    entity.AddComponents(component);
+                    component.Deserialize(byteQueue);
+                    currentIndex++;
+                }
+            }
+        }
+
+        public State Apply(State state)
+        {
+            
+            // TODO: Implement this!
+            // TODO: Also, figure out if we need despawns in updates? I don't think so now.
+
+            var newState = state.Clone();
+            return newState;
+        }
+
         private void AddUpdates(List<Entity> startEntities, List<Entity> endEntities)
         {
             foreach (var componentType in State.componentTypes)
@@ -66,6 +110,21 @@ namespace ConsoleApp1
         public override string ToString()
         {
             var output = $"State [Start Tick: {startTick} End Tick: {endTick}]\r\n";
+
+            output += $"Entities [Count: {entities.Count()}]\r\n";
+            foreach (var entity in entities)
+                output += $"{entity.id} ";
+
+            output += $"\r\nSpawns [Count: {spawns.Count()}]\r\n";
+            foreach (var entity in spawns)
+                output += $"{entity.id} ";
+
+            output += $"\r\nDespawns [Count: {despawns.Count()}]\r\n";
+            foreach (var entity in despawns)
+                output += $"{entity.id} ";
+
+            output += "\r\n";
+
             foreach (var componentType in State.componentTypes)
             {
                 var componentChanges = changes.Where(change => change.componentType == componentType);
@@ -85,6 +144,18 @@ namespace ConsoleApp1
             var output = "";
             output += startTick.ToByteHexString();
             output += $" {endTick.ToByteHexString()}";
+            
+            output += $" {entities.Count().ToByteHexString()}";
+            foreach(var entity in entities)
+                output += $" {entity.id.ToByteHexString()}";
+
+            output += $" {spawns.Count().ToByteHexString()}";
+            foreach (var entity in spawns)
+                output += $" {entity.id.ToByteHexString()}";
+
+            output += $" {despawns.Count().ToByteHexString()}";
+            foreach (var entity in despawns)
+                output += $" {entity.id.ToByteHexString()}";
 
             foreach (var componentType in State.componentTypes)
             {
@@ -113,6 +184,52 @@ namespace ConsoleApp1
             }
             var count = output.Replace(" ", "").Length / 2;
             return $"{output} [{count}]";
+        }
+
+        public IEnumerable<byte> ToBytes()
+        {
+            var bytes = new List<byte>();
+            bytes.AddRange(startTick.ToBytes());
+            bytes.AddRange(endTick.ToBytes());
+
+            bytes.AddRange(entities.Count().ToBytes());
+            foreach (var entity in entities)
+                bytes.AddRange(entity.id.ToBytes());
+
+            bytes.AddRange(spawns.Count().ToBytes());
+            foreach (var entity in spawns)
+                bytes.AddRange(entity.id.ToBytes());
+
+            bytes.AddRange(despawns.Count().ToBytes());
+            foreach (var entity in despawns)
+                bytes.AddRange(entity.id.ToBytes());
+
+            foreach (var componentType in State.componentTypes)
+            {
+                var componentChanges = changes.Where(change => change.componentType == componentType);
+
+                var i = 0;
+                var skip = 0;
+                while (i < componentChanges.Count())
+                {
+                    var delta = componentChanges.ElementAt(i).delta;
+                    if (delta is null)
+                    {
+                        i++;
+                        skip++;
+                    }
+                    else
+                    {
+                        bytes.AddRange(skip.ToBytes());
+                        bytes.AddRange(delta.ToBytes());
+                        i++;
+                        skip = 0;
+                    }
+                }
+                if (skip > 0)
+                    bytes.AddRange(skip.ToBytes());
+            }
+            return bytes;
         }
 
         public class Change

@@ -16,9 +16,17 @@ namespace ConsoleApp1
 
         public override string ToByteHexString()
         {
-            var output = base.ToByteHexString();
-            output += $" {spriteName.ToByteHexString()}";
-            return output;
+            return spriteName.ToByteHexString();
+        }
+
+        public override byte[] ToBytes()
+        {
+            return spriteName.ToBytes();
+        }
+
+        public override void Deserialize(ByteQueue byteQueue)
+        {
+            spriteName = byteQueue.GetString();
         }
     }
 }

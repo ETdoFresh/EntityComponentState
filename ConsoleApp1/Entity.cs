@@ -16,7 +16,7 @@ namespace ConsoleApp1
             id = IDAssignment.GetID(GetType().FullName);
         }
 
-        private Entity(int id)
+        public Entity(int id)
         {
             this.id = id;
         }

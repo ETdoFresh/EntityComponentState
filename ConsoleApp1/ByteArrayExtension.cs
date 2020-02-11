@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ConsoleApp1
@@ -55,6 +56,26 @@ namespace ConsoleApp1
         public static string ToByteHexString(this string value)
         {
             return value.ToByteHexString() + Encoding.UTF8.GetBytes(value);
+        }
+
+        public static byte[] ToBytes(this int value)
+        {
+            return BitConverter.GetBytes(value);
+        }
+
+        public static byte[] ToBytes(this bool value)
+        {
+            return BitConverter.GetBytes(value);
+        }
+
+        public static byte[] ToBytes(this string value)
+        {
+            return value.Length.ToBytes().Concat(Encoding.UTF8.GetBytes(value)).ToArray();
+        }
+
+        public static byte[] ToBytes(this float value)
+        {
+            return BitConverter.GetBytes(value);
         }
     }
 }

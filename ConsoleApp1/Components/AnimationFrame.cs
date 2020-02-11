@@ -16,9 +16,17 @@ namespace ConsoleApp1
 
         public override string ToByteHexString()
         {
-            var output = base.ToByteHexString();
-            output += $" {frame.ToByteHexString()}";
-            return output;
+            return frame.ToByteHexString();
+        }
+
+        public override byte[] ToBytes()
+        {
+            return frame.ToBytes();
+        }
+
+        public override void Deserialize(ByteQueue byteQueue)
+        {
+            frame = byteQueue.GetInt32();
         }
     }
 }

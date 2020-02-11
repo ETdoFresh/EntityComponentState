@@ -26,6 +26,11 @@ namespace ConsoleApp1
             return newState;
         }
 
+        public State Clone()
+        {
+            return Create(tick, entities);
+        }
+
         private int GetCount(Type type)
         {
             var count = 0;

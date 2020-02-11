@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ConsoleApp1
 {
@@ -56,12 +57,29 @@ namespace ConsoleApp1
 
         public override string ToByteHexString()
         {
-            var output = base.ToByteHexString();
-            output += $" {X.ToByteHexString()}";
+            var output = X.ToByteHexString();
             output += $" {Y.ToByteHexString()}";
             output += $" {Z.ToByteHexString()}";
             output += $" {W.ToByteHexString()}";
             return output;
+        }
+
+        public override byte[] ToBytes()
+        {
+            var output = new List<byte>();
+            output.AddRange(X.ToBytes());
+            output.AddRange(Y.ToBytes());
+            output.AddRange(Z.ToBytes());
+            output.AddRange(W.ToBytes());
+            return output.ToArray();
+        }
+
+        public override void Deserialize(ByteQueue byteQueue)
+        {
+            X = byteQueue.GetSingle();
+            Y = byteQueue.GetSingle();
+            Z = byteQueue.GetSingle();
+            W = byteQueue.GetSingle();
         }
     }
 }

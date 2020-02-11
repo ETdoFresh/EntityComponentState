@@ -1,4 +1,6 @@
-﻿namespace ConsoleApp1
+﻿using System;
+
+namespace ConsoleApp1
 {
     public abstract class Component
     {       
@@ -33,9 +35,10 @@
             return entity.id;
         }
 
-        public virtual string ToByteHexString()
-        {
-            return entity.id.ToByteHexString();
-        }
+        public abstract string ToByteHexString();
+
+        public abstract void Deserialize(ByteQueue byteQueue);
+
+        public abstract byte[] ToBytes();
     }
 }
