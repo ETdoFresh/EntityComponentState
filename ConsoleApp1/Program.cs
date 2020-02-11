@@ -44,6 +44,7 @@ namespace ConsoleApp1
 
                 var state1 = State.Create(1, entities);
 
+                ship.GetComponent<Position>().X = 5;
                 entities.Add(asteroid3);
 
                 var state2 = State.Create(2, entities);
@@ -70,6 +71,10 @@ namespace ConsoleApp1
                 ConsoleWriteState(deltaState2);
                 ConsoleWriteState(deltaState3);
                 ConsoleWriteState(deltaState4);
+
+                var newState2 = deltaState1.Apply(state1);
+
+                ConsoleWriteState(newState2);
 
                 Console.WriteLine($"Time to create and show state: {stopwatch.Elapsed.TotalMilliseconds}");
 

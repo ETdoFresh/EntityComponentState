@@ -14,10 +14,13 @@ namespace ConsoleApp1
         {
             var newComponent = Activator.CreateInstance(GetType()) as Vector3Component;
             newComponent.entity = entity;
-            newComponent.X = X;
-            newComponent.Y = Y;
-            newComponent.Z = Z;
+            newComponent.value = value;
             return newComponent;
+        }
+
+        public override void CopyValuesFrom(Component component)
+        {
+            value = ((Vector3Component)component).value;
         }
 
         public override bool Equals(object obj)

@@ -14,6 +14,11 @@ namespace ConsoleApp1
             return newComponent;
         }
 
+        public override void CopyValuesFrom(Component component)
+        {
+            frame = ((AnimationFrame)component).frame;
+        }
+
         public override string ToByteHexString()
         {
             return frame.ToByteHexString();

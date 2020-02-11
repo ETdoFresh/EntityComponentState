@@ -4,6 +4,14 @@ using System.Linq;
 
 namespace ConsoleApp1
 {
+    // TODO:
+    // - Delta State seems too big still. I think I need to change the format...
+    // - Have startState and endState instead of startTick and endTick
+    // - When creating new DeltaState from bytes, also pass in startState (endState will be created)
+    // - Old format: startTick endTick entityCount entityIdList spawnCount spawnIdList despawnCount despawnIdList (Skips ComponentData)LoopEntities
+    // - New format: startTick endTick spawnCount spawnIdList despawnCount despawnIdList (Skips ComponentData)LoopStartStateEntitiesAfterSpawnDespawn
+    // - Think about float compression from 4 bytes to 1 bytes, maybe 10 bits? etc etc
+
     public class DeltaState
     {
         public int startTick;
@@ -29,7 +37,7 @@ namespace ConsoleApp1
             AddUpdates(startEntities, endEntities);
         }
 
-        public DeltaState(byte[] bytes) 
+        public DeltaState(byte[] bytes)
         {
             var byteQueue = new ByteQueue(bytes);
             startTick = byteQueue.GetInt32();
@@ -54,6 +62,8 @@ namespace ConsoleApp1
                 while (currentIndex < entityCount)
                 {
                     var skip = byteQueue.GetInt32();
+                    for (int i = 0; i < skip; i++)
+                        changes.Add(new Change { componentType = componentType, entityId = entities[currentIndex + i].id });
                     currentIndex += skip;
                     if (currentIndex >= entityCount) break;
 
@@ -61,19 +71,26 @@ namespace ConsoleApp1
                     var component = (Component)Activator.CreateInstance(componentType);
                     entity.AddComponents(component);
                     component.Deserialize(byteQueue);
+                    changes.Add(new Change { componentType = componentType, entityId = entity.id, delta = component });
                     currentIndex++;
                 }
             }
         }
 
-        public State Apply(State state)
+        public State Apply(State startState)
         {
-            
-            // TODO: Implement this!
-            // TODO: Also, figure out if we need despawns in updates? I don't think so now.
-
-            var newState = state.Clone();
-            return newState;
+            var state = startState.Clone();
+            state.tick = endTick;
+            state.entities.AddRange(spawns);
+            foreach (var componentType in State.componentTypes)
+                foreach (var entity in state.entities)
+                {
+                    var change = changes.Where(change => change.entityId == entity.id && change.componentType == componentType).First();
+                    if (change.delta != null)
+                        entity.GetComponent(componentType).CopyValuesFrom(change.delta);
+                }
+            state.entities.RemoveAll(entity => despawns.Any(despawn => despawn.id == entity.id));
+            return state;
         }
 
         private void AddUpdates(List<Entity> startEntities, List<Entity> endEntities)
@@ -82,7 +99,7 @@ namespace ConsoleApp1
                 foreach (var entity in entities)
                 {
                     var change = new Change { componentType = componentType, entityId = entity.id };
-                    if (!startEntities.Contains(entity)) 
+                    if (!startEntities.Contains(entity))
                     {
                         if (entity.HasComponent(componentType))
                         {
@@ -144,9 +161,9 @@ namespace ConsoleApp1
             var output = "";
             output += startTick.ToByteHexString();
             output += $" {endTick.ToByteHexString()}";
-            
+
             output += $" {entities.Count().ToByteHexString()}";
-            foreach(var entity in entities)
+            foreach (var entity in entities)
                 output += $" {entity.id.ToByteHexString()}";
 
             output += $" {spawns.Count().ToByteHexString()}";

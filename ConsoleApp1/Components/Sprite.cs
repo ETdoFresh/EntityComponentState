@@ -14,6 +14,11 @@ namespace ConsoleApp1
             return newComponent;
         }
 
+        public override void CopyValuesFrom(Component component)
+        {
+            spriteName = ((Sprite)component).spriteName;
+        }
+
         public override string ToByteHexString()
         {
             return spriteName.ToByteHexString();

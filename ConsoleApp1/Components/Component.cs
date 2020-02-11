@@ -40,5 +40,7 @@ namespace ConsoleApp1
         public abstract void Deserialize(ByteQueue byteQueue);
 
         public abstract byte[] ToBytes();
+
+        public abstract void CopyValuesFrom(Component component);
     }
 }
