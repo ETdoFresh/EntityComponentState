@@ -72,7 +72,7 @@ namespace ConsoleApp1
                 ConsoleWriteState(deltaState3);
                 ConsoleWriteState(deltaState4);
 
-                var newState2 = deltaState1.Apply(state1);
+                var newState2 = deltaState1.GenerateEndState();
 
                 ConsoleWriteState(newState2);
 

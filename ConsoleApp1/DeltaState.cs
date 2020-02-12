@@ -4,70 +4,62 @@ using System.Linq;
 
 namespace ConsoleApp1
 {
-    // TODO:
-    // - Delta State seems too big still. I think I need to change the format...
-    // - Have startState and endState instead of startTick and endTick
-    // - When creating new DeltaState from bytes, also pass in startState (endState will be created)
-    // - Old format: startTick endTick entityCount entityIdList spawnCount spawnIdList despawnCount despawnIdList (Skips ComponentData)LoopEntities
-    // - New format: startTick endTick spawnCount spawnIdList despawnCount despawnIdList (Skips ComponentData)LoopStartStateEntitiesAfterSpawnDespawn
-    // - Think about float compression from 4 bytes to 1 bytes, maybe 10 bits? etc etc
-
     public class DeltaState
     {
-        public int startTick;
-        public int endTick;
-        public IEnumerable<Entity> entities;
+        public State startState;
+        public State endState;
+        public int tick;
         public List<Entity> spawns = new List<Entity>();
         public List<Change> changes = new List<Change>();
         public List<Entity> despawns = new List<Entity>();
 
         public DeltaState(State startState, State endState)
         {
-            this.startTick = startState.tick;
-            this.endTick = endState.tick;
+            this.startState = startState;
+            this.endState = endState;
+            tick = endState.tick;
             var startEntities = startState.entities;
             var endEntities = endState.entities;
 
             var addedEntities = endEntities.Where(endEntity => !startEntities.Any(startEntity => startEntity.id == endEntity.id));
             var removedEntities = startEntities.Where(startEntity => !endEntities.Any(endEntity => startEntity.id == endEntity.id));
 
-            entities = startEntities.Union(addedEntities);
             spawns.AddRange(addedEntities);
             despawns.AddRange(removedEntities);
-            AddUpdates(startEntities, endEntities);
+            AddUpdates();
         }
 
-        public DeltaState(byte[] bytes)
+        public DeltaState(byte[] bytes, State startState)
         {
+            this.startState = startState;
+            this.endState = new State();
             var byteQueue = new ByteQueue(bytes);
-            startTick = byteQueue.GetInt32();
-            endTick = byteQueue.GetInt32();
-            var entityCount = byteQueue.GetInt32();
-            var entities = new List<Entity>();
-            this.entities = entities;
-            for (int i = 0; i < entityCount; i++)
-                entities.Add(new Entity(byteQueue.GetInt32()));
+            var startTick = byteQueue.GetInt32();
+            endState.tick = byteQueue.GetInt32();
+            tick = endState.tick;
 
             var spawnCount = byteQueue.GetInt32();
             for (int i = 0; i < spawnCount; i++)
-                spawns.Add(entities.Where(entity => entity.id == byteQueue.GetInt32()).First());
+                spawns.Add(new Entity(byteQueue.GetInt32()));
 
             var despawnCount = byteQueue.GetInt32();
             for (int i = 0; i < despawnCount; i++)
-                despawns.Add(entities.Where(entity => entity.id == byteQueue.GetInt32()).First());
+                despawns.Add(startState.entities.Where(entity => entity.id == byteQueue.GetInt32()).First());
+
+            endState.entities.AddRange(startState.entities.Union(spawns).Except(despawns).OrderBy(entity => entity.id));
 
             foreach (var componentType in State.componentTypes)
             {
                 var currentIndex = 0;
-                while (currentIndex < entityCount)
+                while (currentIndex < endState.entities.Count)
                 {
                     var skip = byteQueue.GetInt32();
                     for (int i = 0; i < skip; i++)
-                        changes.Add(new Change { componentType = componentType, entityId = entities[currentIndex + i].id });
+                        changes.Add(new Change { componentType = componentType, entityId = endState.entities[currentIndex + i].id });
                     currentIndex += skip;
-                    if (currentIndex >= entityCount) break;
+                    if (currentIndex >= endState.entities.Count) break;
 
-                    var entity = entities[currentIndex];
+                    var entity = endState.entities[currentIndex];
                     var component = (Component)Activator.CreateInstance(componentType);
                     entity.AddComponents(component);
                     component.Deserialize(byteQueue);
@@ -77,60 +69,54 @@ namespace ConsoleApp1
             }
         }
 
-        public State Apply(State startState)
+        public State GenerateEndState()
         {
-            var state = startState.Clone();
-            state.tick = endTick;
-            state.entities.AddRange(spawns);
+            var endState = new State();
+            endState.tick = tick;
+            endState.entities.AddRange(startState.entities.Union(spawns).Except(despawns).OrderBy(entity => entity.id));
             foreach (var componentType in State.componentTypes)
-                foreach (var entity in state.entities)
+                foreach (var entity in endState.entities)
                 {
-                    var change = changes.Where(change => change.entityId == entity.id && change.componentType == componentType).First();
+                    var change = changes.Where(change => change.entityId == entity.id && change.componentType == componentType).FirstOrDefault();
                     if (change.delta != null)
-                        entity.GetComponent(componentType).CopyValuesFrom(change.delta);
+                        if (entity.HasComponent(componentType))
+                            entity.GetComponent(componentType).CopyValuesFrom(change.delta);
+                        else
+                            entity.AddComponents(change.delta);
                 }
-            state.entities.RemoveAll(entity => despawns.Any(despawn => despawn.id == entity.id));
-            return state;
+            return endState;
         }
 
-        private void AddUpdates(List<Entity> startEntities, List<Entity> endEntities)
+        private void AddUpdates()
         {
             foreach (var componentType in State.componentTypes)
-                foreach (var entity in entities)
+                foreach (var endStateEntity in endState.entities)
                 {
-                    var change = new Change { componentType = componentType, entityId = entity.id };
-                    if (!startEntities.Contains(entity))
+                    var change = new Change { componentType = componentType, entityId = endStateEntity.id };
+                    var startStateEntity = startState.entities.Where(startStateEntity => startStateEntity.id == endStateEntity.id).FirstOrDefault();
+                    if (startStateEntity == null)
                     {
-                        if (entity.HasComponent(componentType))
+                        if (endStateEntity.HasComponent(componentType))
                         {
-                            // Start State Empty --> End State Has Values == Change!
-                            change.delta = entity.GetComponent(componentType);
+                            change.delta = endStateEntity.GetComponent(componentType);
                         }
-                        // Start State Empty --> End State Empty == No Change!  (Skip)
+                        // Else Skip
                     }
-                    else if (endEntities.Any(endEntity => endEntity.id == entity.id))
+                    else // StartState has entity
                     {
-                        var endEntity = endEntities.Where(endEntity => endEntity.id == entity.id).FirstOrDefault();
-                        if (entity.GetComponent(componentType) != endEntity.GetComponent(componentType))
+                        if (endStateEntity.GetComponent(componentType) != startStateEntity.GetComponent(componentType))
                         {
-                            // Start State Has Values --> End State Has Different Values == Change!
-                            change.delta = endEntity.GetComponent(componentType);
+                            change.delta = endStateEntity.GetComponent(componentType);
                         }
-                        // Start State Has Values --> End State Has Same Values == No Change! (Skip)
+                        // Else Skip
                     }
-                    // Start State Has Value --> End State Empty == Iffy Skip?
-                    // Otherwise Skip
                     changes.Add(change);
                 }
         }
 
         public override string ToString()
         {
-            var output = $"State [Start Tick: {startTick} End Tick: {endTick}]\r\n";
-
-            output += $"Entities [Count: {entities.Count()}]\r\n";
-            foreach (var entity in entities)
-                output += $"{entity.id} ";
+            var output = $"State [Start Tick: {startState.tick} End Tick: {endState.tick}]\r\n";
 
             output += $"\r\nSpawns [Count: {spawns.Count()}]\r\n";
             foreach (var entity in spawns)
@@ -159,12 +145,8 @@ namespace ConsoleApp1
         public string ToByteHexString()
         {
             var output = "";
-            output += startTick.ToByteHexString();
-            output += $" {endTick.ToByteHexString()}";
-
-            output += $" {entities.Count().ToByteHexString()}";
-            foreach (var entity in entities)
-                output += $" {entity.id.ToByteHexString()}";
+            output += startState.tick.ToByteHexString();
+            output += $" {endState.tick.ToByteHexString()}";
 
             output += $" {spawns.Count().ToByteHexString()}";
             foreach (var entity in spawns)
@@ -206,12 +188,8 @@ namespace ConsoleApp1
         public IEnumerable<byte> ToBytes()
         {
             var bytes = new List<byte>();
-            bytes.AddRange(startTick.ToBytes());
-            bytes.AddRange(endTick.ToBytes());
-
-            bytes.AddRange(entities.Count().ToBytes());
-            foreach (var entity in entities)
-                bytes.AddRange(entity.id.ToBytes());
+            bytes.AddRange(startState.tick.ToBytes());
+            bytes.AddRange(endState.tick.ToBytes());
 
             bytes.AddRange(spawns.Count().ToBytes());
             foreach (var entity in spawns)
