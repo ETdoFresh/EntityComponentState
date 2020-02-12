@@ -24,6 +24,11 @@ namespace ConsoleApp1
             return frame.ToByteHexString();
         }
 
+        public override string ToCompressedByteHexString()
+        {
+            return ((byte)frame).ToByteHexString();
+        }
+
         public override byte[] ToBytes()
         {
             return frame.ToBytes();

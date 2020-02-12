@@ -90,5 +90,20 @@ namespace ConsoleApp1
             var count = output.Replace(" ", "").Length / 2;
             return $"{output} [{count}]";
         }
+
+        public string ToCompressedByteHexString()
+        {
+            var output = "";
+            output += tick.ToByteHexString();
+
+            foreach (var componentType in componentTypes)
+            {
+                output += $" {BitConverter.GetBytes((byte)GetCount(componentType)).ToHexString()}";
+                foreach (var component in GetComponents(componentType))
+                    output += $" {component.ToCompressedByteHexString()}";
+            }
+            var count = output.Replace(" ", "").Length / 2;
+            return $"{output} [{count}]";
+        }
     }
 }

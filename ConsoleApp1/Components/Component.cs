@@ -37,6 +37,8 @@ namespace ConsoleApp1
 
         public abstract string ToByteHexString();
 
+        public abstract string ToCompressedByteHexString();
+
         public abstract void Deserialize(ByteQueue byteQueue);
 
         public abstract byte[] ToBytes();

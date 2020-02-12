@@ -142,6 +142,49 @@ namespace ConsoleApp1
             return output;
         }
 
+        public string ToCompressedByteHexString()
+        {
+            var output = "";
+            output += startState.tick.ToByteHexString();
+            output += $" {endState.tick.ToByteHexString()}";
+
+            output += $" {((byte)spawns.Count()).ToByteHexString()}";
+            foreach (var entity in spawns)
+                output += $" {((byte)entity.id).ToByteHexString()}";
+
+            output += $" {((byte)despawns.Count()).ToByteHexString()}";
+            foreach (var entity in despawns)
+                output += $" {((byte)entity.id).ToByteHexString()}";
+
+            foreach (var componentType in State.componentTypes)
+            {
+                var componentChanges = changes.Where(change => change.componentType == componentType);
+
+                var i = 0;
+                byte skip = 0;
+                while (i < componentChanges.Count())
+                {
+                    var delta = componentChanges.ElementAt(i).delta;
+                    if (delta is null)
+                    {
+                        i++;
+                        skip++;
+                    }
+                    else
+                    {
+                        output += $" {skip.ToByteHexString()}";
+                        output += $" {delta.ToCompressedByteHexString()}";
+                        i++;
+                        skip = 0;
+                    }
+                }
+                if (skip > 0)
+                    output += $" {skip.ToByteHexString()}";
+            }
+            var count = output.Replace(" ", "").Length / 2;
+            return $"{output} [{count}]";
+        }
+
         public string ToByteHexString()
         {
             var output = "";

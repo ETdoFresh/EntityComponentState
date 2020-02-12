@@ -7,6 +7,11 @@ namespace ConsoleApp1
 {
     public static class ByteArrayExtension
     {
+        public static string ToHexString(this byte @byte)
+        {
+            return $"{@byte:x2}";
+        }
+
         public static string ToHexString(this byte[] bytes)
         {
             var output = "";
@@ -17,6 +22,10 @@ namespace ConsoleApp1
             return output;
         }
 
+        public static string ToByteHexString(this byte value)
+        {
+            return value.ToHexString();
+        }
 
         public static string ToByteHexString(this int value)
         {
@@ -76,6 +85,38 @@ namespace ConsoleApp1
         public static byte[] ToBytes(this float value)
         {
             return BitConverter.GetBytes(value);
+        }
+
+        public static byte[] ToCompressedBytes(this float value, float minRange, float maxRange, int bytes)
+        {
+            if (bytes >= 4) return ToBytes(value);
+            value = Math.Clamp(value, minRange, maxRange);
+            var range = maxRange - minRange;
+            var normalized = (value - minRange) / range;
+            if (bytes == 1)
+            {
+                var unitIncrement = range / 256;
+                var incrementValue = (byte)Math.Ceiling(normalized / unitIncrement);
+                return BitConverter.GetBytes(incrementValue);
+            }
+            if (bytes == 2)
+            {
+                var unitIncrement = range / 65536;
+                var incrementValue = (ushort)Math.Ceiling(normalized / unitIncrement);
+                return BitConverter.GetBytes(incrementValue);
+            }
+            if (bytes == 3)
+            {
+                var unitIncrement = range / 16777216;
+                var incrementValue = (uint)Math.Ceiling(normalized / unitIncrement);
+                return BitConverter.GetBytes(incrementValue).Take(3).ToArray();
+            }
+            throw new Exception("GetCompressedSingle(), bytes must be > 0");
+        }
+
+        public static string ToCompressedBytesHexString(this float value, float minRange, float maxRange, int bytes)
+        {
+            return ToCompressedBytes(value, minRange, maxRange, bytes).ToHexString();
         }
     }
 }

@@ -40,5 +40,33 @@ namespace ConsoleApp1
             RemoveRange(0, size);
             return value;
         }
+
+        public float GetCompressedSingle(float minRange, float maxRange, int bytes)
+        {
+            if (bytes >= 4) return GetSingle();
+            var range = maxRange - minRange;
+            if (bytes == 1)
+            {
+                var unitIncrement = range / 256;
+                var normalized = this.Take(1).First();
+                this.RemoveRange(0, bytes);
+                return normalized * unitIncrement + minRange;
+            }
+            if (bytes == 2)
+            {
+                var unitIncrement = range / 65536;
+                var normalized = BitConverter.ToUInt16(this.Take(2).ToArray());
+                this.RemoveRange(0, bytes);
+                return normalized * unitIncrement + minRange;
+            }
+            if (bytes == 3)
+            {
+                var unitIncrement = range / 16777216;
+                var normalized = BitConverter.ToUInt16(this.Take(2).ToArray());
+                this.RemoveRange(0, bytes);
+                return normalized * unitIncrement + minRange;
+            }
+            throw new Exception("GetCompressedSingle(), bytes must be > 0");
+        }
     }
 }

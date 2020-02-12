@@ -64,6 +64,14 @@ namespace ConsoleApp1
             return output;
         }
 
+        public override string ToCompressedByteHexString()
+        {
+            var output = X.ToCompressedBytesHexString(-65.536f, 65.536f, 2);
+            output += $" {Y.ToCompressedBytesHexString(-65.536f, 65.536f, 2)}";
+            output += $" {Z.ToCompressedBytesHexString(-65.536f, 65.536f, 2)}";
+            return output;
+        }
+
         public override byte[] ToBytes()
         {
             var output = new List<byte>();

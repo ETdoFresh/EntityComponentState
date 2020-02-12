@@ -24,6 +24,11 @@ namespace ConsoleApp1
             return spriteName.ToByteHexString();
         }
 
+        public override string ToCompressedByteHexString()
+        {
+            return spriteName.ToByteHexString();
+        }
+
         public override byte[] ToBytes()
         {
             return spriteName.ToBytes();

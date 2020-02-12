@@ -86,12 +86,14 @@ namespace ConsoleApp1
         {
             Console.WriteLine(state);
             Console.WriteLine($"Bytes: {state.ToByteHexString()}");
+            Console.WriteLine($"Compressed Bytes: {state.ToCompressedByteHexString()}");
         }
 
         private static void ConsoleWriteState(DeltaState deltaState)
         {
             Console.WriteLine(deltaState);
             Console.WriteLine($"Bytes: {deltaState.ToByteHexString()}");
+            Console.WriteLine($"Compressed Bytes: {deltaState.ToCompressedByteHexString()}");
         }
     }
 }
