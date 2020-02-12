@@ -34,6 +34,11 @@ namespace ConsoleApp1
             return frame.ToBytes();
         }
 
+        public override byte[] ToCompressedBytes()
+        {
+            return ((byte)frame).ToBytes();
+        }
+
         public override void Deserialize(ByteQueue byteQueue)
         {
             frame = byteQueue.GetInt32();

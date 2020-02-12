@@ -34,6 +34,11 @@ namespace ConsoleApp1
             return spriteName.ToBytes();
         }
 
+        public override byte[] ToCompressedBytes()
+        {
+            return spriteName.ToBytes();
+        }
+
         public override void Deserialize(ByteQueue byteQueue)
         {
             spriteName = byteQueue.GetString();

@@ -85,6 +85,16 @@ namespace ConsoleApp1
             return output.ToArray();
         }
 
+        public override byte[] ToCompressedBytes()
+        {
+            var output = new List<byte>();
+            output.AddRange(X.ToCompressedBytes(-1.28f, 1.28f, 1));
+            output.AddRange(Y.ToCompressedBytes(-1.28f, 1.28f, 1));
+            output.AddRange(Z.ToCompressedBytes(-1.28f, 1.28f, 1));
+            output.AddRange(W.ToCompressedBytes(-1.28f, 1.28f, 1));
+            return output.ToArray();
+        }
+
         public override void Deserialize(ByteQueue byteQueue)
         {
             X = byteQueue.GetSingle();

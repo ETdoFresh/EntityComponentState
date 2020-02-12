@@ -76,6 +76,34 @@ namespace ConsoleApp1
             return output;
         }
 
+        public byte[] ToBytes()
+        {
+            var bytes = new List<byte>();
+            bytes.AddRange(tick.ToBytes());
+
+            foreach (var componentType in componentTypes)
+            {
+                bytes.AddRange(GetCount(componentType).ToBytes());
+                foreach (var component in GetComponents(componentType))
+                    bytes.AddRange(component.ToBytes());
+            }
+            return bytes.ToArray();
+        }
+
+        public byte[] ToCompressedBytes()
+        {
+            var bytes = new List<byte>();
+            bytes.AddRange(tick.ToBytes());
+
+            foreach (var componentType in componentTypes)
+            {
+                bytes.AddRange(((byte)GetCount(componentType)).ToBytes());
+                foreach (var component in GetComponents(componentType))
+                    bytes.AddRange(component.ToBytes());
+            }
+            return bytes.ToArray();
+        }
+
         public string ToByteHexString()
         {
             var output = "";

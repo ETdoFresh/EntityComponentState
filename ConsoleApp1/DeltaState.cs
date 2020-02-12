@@ -228,7 +228,7 @@ namespace ConsoleApp1
             return $"{output} [{count}]";
         }
 
-        public IEnumerable<byte> ToBytes()
+        public byte[] ToBytes()
         {
             var bytes = new List<byte>();
             bytes.AddRange(startState.tick.ToBytes());
@@ -267,7 +267,49 @@ namespace ConsoleApp1
                 if (skip > 0)
                     bytes.AddRange(skip.ToBytes());
             }
-            return bytes;
+            return bytes.ToArray();
+        }
+
+        public byte[] ToCompressedBytes()
+        {
+            var bytes = new List<byte>();
+            bytes.AddRange(startState.tick.ToBytes());
+            bytes.AddRange(endState.tick.ToBytes());
+
+            bytes.AddRange(((byte)spawns.Count()).ToBytes());
+            foreach (var entity in spawns)
+                bytes.AddRange(((byte)entity.id).ToBytes());
+
+            bytes.AddRange(((byte)despawns.Count()).ToBytes());
+            foreach (var entity in despawns)
+                bytes.AddRange(((byte)entity.id).ToBytes());
+
+            foreach (var componentType in State.componentTypes)
+            {
+                var componentChanges = changes.Where(change => change.componentType == componentType);
+
+                var i = 0;
+                byte skip = 0;
+                while (i < componentChanges.Count())
+                {
+                    var delta = componentChanges.ElementAt(i).delta;
+                    if (delta is null)
+                    {
+                        i++;
+                        skip++;
+                    }
+                    else
+                    {
+                        bytes.AddRange(skip.ToBytes());
+                        bytes.AddRange(delta.ToCompressedBytes());
+                        i++;
+                        skip = 0;
+                    }
+                }
+                if (skip > 0)
+                    bytes.AddRange(skip.ToBytes());
+            }
+            return bytes.ToArray();
         }
 
         public class Change

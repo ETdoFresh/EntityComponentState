@@ -87,6 +87,8 @@ namespace ConsoleApp1
             Console.WriteLine(state);
             Console.WriteLine($"Bytes: {state.ToByteHexString()}");
             Console.WriteLine($"Compressed Bytes: {state.ToCompressedByteHexString()}");
+            Console.WriteLine($"Base64: {Convert.ToBase64String(state.ToBytes())} [{Convert.ToBase64String(state.ToBytes()).Length}]");
+            Console.WriteLine($"Compressed Base64: {Convert.ToBase64String(state.ToCompressedBytes())} [{Convert.ToBase64String(state.ToCompressedBytes()).Length}]");
         }
 
         private static void ConsoleWriteState(DeltaState deltaState)
@@ -94,6 +96,8 @@ namespace ConsoleApp1
             Console.WriteLine(deltaState);
             Console.WriteLine($"Bytes: {deltaState.ToByteHexString()}");
             Console.WriteLine($"Compressed Bytes: {deltaState.ToCompressedByteHexString()}");
+            Console.WriteLine($"Base64: {Convert.ToBase64String(deltaState.ToBytes())} [{Convert.ToBase64String(deltaState.ToBytes()).Length}]");
+            Console.WriteLine($"Compressed Base64: {Convert.ToBase64String(deltaState.ToCompressedBytes())} [{Convert.ToBase64String(deltaState.ToCompressedBytes()).Length}]");
         }
     }
 }

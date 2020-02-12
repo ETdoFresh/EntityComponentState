@@ -15,7 +15,7 @@ namespace ConsoleApp1
         public static string ToHexString(this byte[] bytes)
         {
             var output = "";
-            
+
             foreach (var @byte in bytes)
                 output += $"{@byte:x2}";
 
@@ -65,6 +65,11 @@ namespace ConsoleApp1
         public static string ToByteHexString(this string value)
         {
             return value.ToByteHexString() + Encoding.UTF8.GetBytes(value);
+        }
+
+        public static byte[] ToBytes(this byte value)
+        {
+            return new byte[] { value };
         }
 
         public static byte[] ToBytes(this int value)
