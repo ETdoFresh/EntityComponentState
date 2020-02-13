@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ConsoleApp1
+namespace EntityComponentState
 {
     public class DeltaState
     {
@@ -10,7 +10,7 @@ namespace ConsoleApp1
         public State endState;
         public int tick;
         public List<Entity> spawns = new List<Entity>();
-        public List<Change> changes = new List<Change>();
+        private readonly List<Change> changes = new List<Change>();
         public List<Entity> despawns = new List<Entity>();
 
         public DeltaState(State startState, State endState)
@@ -48,7 +48,7 @@ namespace ConsoleApp1
 
             endState.entities.AddRange(startState.entities.Union(spawns).Except(despawns).OrderBy(entity => entity.id));
 
-            foreach (var componentType in State.componentTypes)
+            foreach (var componentType in Component.types)
             {
                 var currentIndex = 0;
                 while (currentIndex < endState.entities.Count)
@@ -61,7 +61,7 @@ namespace ConsoleApp1
 
                     var entity = endState.entities[currentIndex];
                     var component = (Component)Activator.CreateInstance(componentType);
-                    entity.AddComponents(component);
+                    entity.AddComponent(component);
                     component.Deserialize(byteQueue);
                     changes.Add(new Change { componentType = componentType, entityId = entity.id, delta = component });
                     currentIndex++;
@@ -71,29 +71,31 @@ namespace ConsoleApp1
 
         public State GenerateEndState()
         {
-            var endState = new State();
-            endState.tick = tick;
+            var endState = new State
+            {
+                tick = tick
+            };
             endState.entities.AddRange(startState.entities.Union(spawns).Except(despawns).OrderBy(entity => entity.id));
-            foreach (var componentType in State.componentTypes)
+            foreach (var componentType in Component.types)
                 foreach (var entity in endState.entities)
                 {
-                    var change = changes.Where(change => change.entityId == entity.id && change.componentType == componentType).FirstOrDefault();
+                    var change = changes.Where(c => c.entityId == entity.id && c.componentType == componentType).FirstOrDefault();
                     if (change.delta != null)
                         if (entity.HasComponent(componentType))
                             entity.GetComponent(componentType).CopyValuesFrom(change.delta);
                         else
-                            entity.AddComponents(change.delta);
+                            entity.AddComponent(change.delta);
                 }
             return endState;
         }
 
         private void AddUpdates()
         {
-            foreach (var componentType in State.componentTypes)
+            foreach (var componentType in Component.types)
                 foreach (var endStateEntity in endState.entities)
                 {
                     var change = new Change { componentType = componentType, entityId = endStateEntity.id };
-                    var startStateEntity = startState.entities.Where(startStateEntity => startStateEntity.id == endStateEntity.id).FirstOrDefault();
+                    var startStateEntity = startState.entities.Where(sse => sse.id == endStateEntity.id).FirstOrDefault();
                     if (startStateEntity == null)
                     {
                         if (endStateEntity.HasComponent(componentType))
@@ -128,7 +130,7 @@ namespace ConsoleApp1
 
             output += "\r\n";
 
-            foreach (var componentType in State.componentTypes)
+            foreach (var componentType in Component.types)
             {
                 var componentChanges = changes.Where(change => change.componentType == componentType);
                 output += $"  {componentType.Name} [Count: {componentChanges.Count()}]\r\n";
@@ -156,7 +158,7 @@ namespace ConsoleApp1
             foreach (var entity in despawns)
                 output += $" {((byte)entity.id).ToByteHexString()}";
 
-            foreach (var componentType in State.componentTypes)
+            foreach (var componentType in Component.types)
             {
                 var componentChanges = changes.Where(change => change.componentType == componentType);
 
@@ -199,7 +201,7 @@ namespace ConsoleApp1
             foreach (var entity in despawns)
                 output += $" {entity.id.ToByteHexString()}";
 
-            foreach (var componentType in State.componentTypes)
+            foreach (var componentType in Component.types)
             {
                 var componentChanges = changes.Where(change => change.componentType == componentType);
 
@@ -242,7 +244,7 @@ namespace ConsoleApp1
             foreach (var entity in despawns)
                 bytes.AddRange(entity.id.ToBytes());
 
-            foreach (var componentType in State.componentTypes)
+            foreach (var componentType in Component.types)
             {
                 var componentChanges = changes.Where(change => change.componentType == componentType);
 
@@ -284,7 +286,7 @@ namespace ConsoleApp1
             foreach (var entity in despawns)
                 bytes.AddRange(((byte)entity.id).ToBytes());
 
-            foreach (var componentType in State.componentTypes)
+            foreach (var componentType in Component.types)
             {
                 var componentChanges = changes.Where(change => change.componentType == componentType);
 
@@ -312,7 +314,7 @@ namespace ConsoleApp1
             return bytes.ToArray();
         }
 
-        public class Change
+        private class Change
         {
             public int entityId;
             public Type componentType;

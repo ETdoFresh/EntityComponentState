@@ -1,4 +1,5 @@
 using ConsoleApp1;
+using EntityComponentState;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTestProject1
@@ -29,8 +30,8 @@ namespace UnitTestProject1
             var entity2 = new Entity();
             var positionComponent1 = new Position(1, 2, 3);
             var positionComponent2 = new Position(1, 2, 3);
-            entity1.AddComponents(positionComponent1);
-            entity2.AddComponents(positionComponent2);
+            entity1.AddComponent(positionComponent1);
+            entity2.AddComponent(positionComponent2);
             Assert.IsTrue(positionComponent1 != positionComponent2);
         }
 
@@ -40,8 +41,8 @@ namespace UnitTestProject1
             var entity1 = new Entity();
             var positionComponent1 = new Position(1, 2, 3);
             var positionComponent2 = new Position(1, 2, 3);
-            entity1.AddComponents(positionComponent1);
-            entity1.AddComponents(positionComponent2);
+            entity1.AddComponent(positionComponent1);
+            entity1.AddComponent(positionComponent2);
             Assert.IsTrue(positionComponent1 == positionComponent2);
         }
 
@@ -51,8 +52,8 @@ namespace UnitTestProject1
             var entity1 = new Entity();
             var positionComponent1 = new Position(1, 2, 3);
             var positionComponent2 = new Position(4, 5, 6);
-            entity1.AddComponents(positionComponent1);
-            entity1.AddComponents(positionComponent2);
+            entity1.AddComponent(positionComponent1);
+            entity1.AddComponent(positionComponent2);
             Assert.IsTrue(positionComponent1 != positionComponent2);
         }
 
@@ -63,8 +64,8 @@ namespace UnitTestProject1
             var entity2 = new Entity();
             var positionComponent1 = new Position(1, 2, 3);
             var positionComponent2 = new Position(4, 5, 6);
-            entity1.AddComponents(positionComponent1);
-            entity2.AddComponents(positionComponent2);
+            entity1.AddComponent(positionComponent1);
+            entity2.AddComponent(positionComponent2);
             Assert.IsTrue(positionComponent1 != positionComponent2);
         }
 
@@ -74,7 +75,7 @@ namespace UnitTestProject1
             var entity1 = new Entity();
             var positionComponent1 = new Position(1, 2, 3);
             var rotationComponent1 = new Rotation();
-            entity1.AddComponents(positionComponent1, rotationComponent1);
+            entity1.AddComponent(positionComponent1, rotationComponent1);
 
             var positionComponent2 = positionComponent1.Clone();
             var rotationComponent2 = rotationComponent1.Clone();

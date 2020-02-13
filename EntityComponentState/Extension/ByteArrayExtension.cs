@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ConsoleApp1
+namespace EntityComponentState
 {
     public static class ByteArrayExtension
     {
@@ -101,19 +100,19 @@ namespace ConsoleApp1
             if (bytes == 1)
             {
                 var unitIncrement = range / 256;
-                var incrementValue = (byte)Math.Ceiling(normalized / unitIncrement);
+                var incrementValue = Math.CeilingToByte(normalized / unitIncrement);
                 return BitConverter.GetBytes(incrementValue);
             }
             if (bytes == 2)
             {
                 var unitIncrement = range / 65536;
-                var incrementValue = (ushort)Math.Ceiling(normalized / unitIncrement);
+                var incrementValue = (ushort)Math.CeilingToUShort(normalized / unitIncrement);
                 return BitConverter.GetBytes(incrementValue);
             }
             if (bytes == 3)
             {
                 var unitIncrement = range / 16777216;
-                var incrementValue = (uint)Math.Ceiling(normalized / unitIncrement);
+                var incrementValue = (uint)Math.CeilingToUInt(normalized / unitIncrement);
                 return BitConverter.GetBytes(incrementValue).Take(3).ToArray();
             }
             throw new Exception("GetCompressedSingle(), bytes must be > 0");

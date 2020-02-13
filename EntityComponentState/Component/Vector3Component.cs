@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ConsoleApp1
+namespace EntityComponentState
 {
-    public abstract class Vector4Component : Component
+    public abstract class Vector3Component : Component
     {
-        public Vector4 value;
+        public Vector3 value;
         public float X { get => value.x; set => this.value.x = value; }
         public float Y { get => value.y; set => this.value.y = value; }
         public float Z { get => value.z; set => this.value.z = value; }
-        public float W { get => value.w; set => this.value.w = value; }
 
         public override Component Clone()
         {
-            var newComponent = Activator.CreateInstance(GetType()) as Vector4Component;
+            var newComponent = Activator.CreateInstance(GetType()) as Vector3Component;
             newComponent.entity = entity;
             newComponent.value = value;
             return newComponent;
@@ -21,13 +20,13 @@ namespace ConsoleApp1
 
         public override void CopyValuesFrom(Component component)
         {
-            value = ((Vector4Component)component).value;
+            value = ((Vector3Component)component).value;
         }
 
         public override bool Equals(object obj)
         {
             if (base.Equals(obj))
-                if (obj is Vector4Component other)
+                if (obj is Vector3Component other)
                     if (this.value == other.value)
                         return true;
 
@@ -39,7 +38,7 @@ namespace ConsoleApp1
             return value.GetHashCode();
         }
 
-        public static bool operator ==(Vector4Component lhs, Vector4Component rhs)
+        public static bool operator ==(Vector3Component lhs, Vector3Component rhs)
         {
             if (lhs is null)
                 return rhs is null;
@@ -47,14 +46,14 @@ namespace ConsoleApp1
                 return lhs.Equals(rhs);
         }
 
-        public static bool operator !=(Vector4Component lhs, Vector4Component rhs)
+        public static bool operator !=(Vector3Component lhs, Vector3Component rhs)
         {
             return !(lhs == rhs);
         }
 
         public override string ToString()
         {
-            return $"Entity ID: {entity.id} [X: {X}, Y: {Y}, Z: {Z}, W: {W}]";
+            return $"Entity ID: {entity.id} [X: {X}, Y: {Y}, Z: {Z}]";
         }
 
         public override string ToByteHexString()
@@ -62,16 +61,14 @@ namespace ConsoleApp1
             var output = X.ToByteHexString();
             output += $" {Y.ToByteHexString()}";
             output += $" {Z.ToByteHexString()}";
-            output += $" {W.ToByteHexString()}";
             return output;
         }
 
         public override string ToCompressedByteHexString()
         {
-            var output = X.ToCompressedBytesHexString(-1.28f, 1.28f, 1);
-            output += $" {Y.ToCompressedBytesHexString(-1.28f, 1.28f, 1)}";
-            output += $" {Z.ToCompressedBytesHexString(-1.28f, 1.28f, 1)}";
-            output += $" {W.ToCompressedBytesHexString(-1.28f, 1.28f, 1)}";
+            var output = X.ToCompressedBytesHexString(-65.536f, 65.536f, 2);
+            output += $" {Y.ToCompressedBytesHexString(-65.536f, 65.536f, 2)}";
+            output += $" {Z.ToCompressedBytesHexString(-65.536f, 65.536f, 2)}";
             return output;
         }
 
@@ -81,17 +78,15 @@ namespace ConsoleApp1
             output.AddRange(X.ToBytes());
             output.AddRange(Y.ToBytes());
             output.AddRange(Z.ToBytes());
-            output.AddRange(W.ToBytes());
             return output.ToArray();
         }
 
         public override byte[] ToCompressedBytes()
         {
             var output = new List<byte>();
-            output.AddRange(X.ToCompressedBytes(-1.28f, 1.28f, 1));
-            output.AddRange(Y.ToCompressedBytes(-1.28f, 1.28f, 1));
-            output.AddRange(Z.ToCompressedBytes(-1.28f, 1.28f, 1));
-            output.AddRange(W.ToCompressedBytes(-1.28f, 1.28f, 1));
+            output.AddRange(X.ToCompressedBytes(-65.536f, 65.536f, 2));
+            output.AddRange(Y.ToCompressedBytes(-65.536f, 65.536f, 2));
+            output.AddRange(Z.ToCompressedBytes(-65.536f, 65.536f, 2));
             return output.ToArray();
         }
 
@@ -100,7 +95,6 @@ namespace ConsoleApp1
             X = byteQueue.GetSingle();
             Y = byteQueue.GetSingle();
             Z = byteQueue.GetSingle();
-            W = byteQueue.GetSingle();
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ConsoleApp1
+namespace EntityComponentState
 {
     public class Position : Vector3Component
     {

@@ -1,4 +1,5 @@
 using ConsoleApp1;
+using EntityComponentState;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
@@ -57,7 +58,7 @@ namespace UnitTestProject1
             var entity = new Entity();
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                entity.AddComponents(null);
+                entity.AddComponent(null);
             });
         }
 
@@ -67,7 +68,7 @@ namespace UnitTestProject1
             var entity = new Entity();
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                entity.AddComponents(new Position(), null);
+                entity.AddComponent(new Position(), null);
             });
         }
 
@@ -75,7 +76,7 @@ namespace UnitTestProject1
         public void AddComponentAddsComponentToList()
         {
             var entity = new Entity();
-            entity.AddComponents(new Position());
+            entity.AddComponent(new Position());
             Assert.IsTrue(entity.components.Count == 1);
             Assert.IsTrue(entity.components[0] is Position);
         }
@@ -111,8 +112,8 @@ namespace UnitTestProject1
             var entity2 = entity1.Clone();
             var component1 = new Position();
             var component2 = new Position();
-            entity1.AddComponents(component1);
-            entity2.AddComponents(component2);
+            entity1.AddComponent(component1);
+            entity2.AddComponent(component2);
 
         }
     }

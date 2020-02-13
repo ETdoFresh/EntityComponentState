@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ConsoleApp1
+namespace EntityComponentState
 {
     public static class IDAssignment
     {
-        private static Dictionary<int, string> ids = new Dictionary<int, string>();
+        private static readonly Dictionary<int, string> ids = new Dictionary<int, string>();
 
         public static int GetID(string description)
         {

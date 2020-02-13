@@ -1,4 +1,4 @@
-﻿namespace ConsoleApp1
+﻿namespace EntityComponentState
 {
     public class AngularVelocity : Vector3Component 
     {

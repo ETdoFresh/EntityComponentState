@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ConsoleApp1
+namespace EntityComponentState
 {
     public class ByteQueue : List<byte>
     {
@@ -13,6 +13,14 @@ namespace ConsoleApp1
         {
             var size = 4;
             var value = BitConverter.ToInt32(this.Take(size).ToArray(), 0);
+            RemoveRange(0, size);
+            return value;
+        }
+
+        public byte GetByte()
+        {
+            var size = 1;
+            var value = this.Take(size).First();
             RemoveRange(0, size);
             return value;
         }
@@ -55,14 +63,14 @@ namespace ConsoleApp1
             if (bytes == 2)
             {
                 var unitIncrement = range / 65536;
-                var normalized = BitConverter.ToUInt16(this.Take(2).ToArray());
+                var normalized = BitConverter.ToUInt16(this.Take(2).ToArray(), 0);
                 this.RemoveRange(0, bytes);
                 return normalized * unitIncrement + minRange;
             }
             if (bytes == 3)
             {
                 var unitIncrement = range / 16777216;
-                var normalized = BitConverter.ToUInt16(this.Take(2).ToArray());
+                var normalized = BitConverter.ToUInt32(this.Take(2).ToArray(), 0);
                 this.RemoveRange(0, bytes);
                 return normalized * unitIncrement + minRange;
             }

@@ -1,9 +1,23 @@
-﻿using System;
+﻿using EntityComponentState;
+using System;
+using System.Collections.Generic;
 
-namespace ConsoleApp1
+namespace EntityComponentState
 {
     public abstract class Component
-    {       
+    {
+        public static List<Type> types = new List<Type>
+        {
+            typeof(Position),
+            typeof(Rotation),
+            typeof(Scale),
+            typeof(Velocity),
+            typeof(AngularVelocity),
+            typeof(Sprite),
+            typeof(AnimationFrame),
+            typeof(Primitive)
+        };
+
         public Entity entity = Entity.NULL;
 
         public abstract Component Clone();

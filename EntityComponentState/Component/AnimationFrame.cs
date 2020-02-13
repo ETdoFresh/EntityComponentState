@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ConsoleApp1
+namespace EntityComponentState
 {
     public class AnimationFrame : Component 
     {
@@ -42,6 +42,11 @@ namespace ConsoleApp1
         public override void Deserialize(ByteQueue byteQueue)
         {
             frame = byteQueue.GetInt32();
+        }
+
+        public override string ToString()
+        {
+            return $"Entity ID: {entity.id} [{frame}]";
         }
     }
 }

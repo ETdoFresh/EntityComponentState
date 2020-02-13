@@ -1,25 +1,23 @@
-﻿namespace ConsoleApp1
+﻿namespace EntityComponentState
 {
-    public struct Vector4
+    public struct Vector3
     {
-        public float x, y, z, w;
+        public float x, y, z;
 
-        public Vector4(float x, float y, float z, float w)
+        public Vector3(float x, float y, float z)
         {
             this.x = x;
             this.y = y;
             this.z = z;
-            this.w = w;
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is Vector4 other)
+            if (obj is Vector3 other)
             {
                 if (this.x != other.x) return false;
                 if (this.y != other.y) return false;
                 if (this.z != other.z) return false;
-                if (this.w != other.w) return false;
                 return true;
             }
             return false;
@@ -27,15 +25,15 @@
 
         public override int GetHashCode()
         {
-            return (int)x + (int)y * 100 + (int)z * 1000 + (int)w * 10000;
+            return (int)x + (int)y * 100 + (int)z * 1000;
         }
 
-        public static bool operator ==(Vector4 lhs, Vector4 rhs)
-        {
+        public static bool operator ==(Vector3 lhs, Vector3 rhs)
+        {            
             return lhs.Equals(rhs);
         }
 
-        public static bool operator !=(Vector4 lhs, Vector4 rhs)
+        public static bool operator !=(Vector3 lhs, Vector3 rhs)
         {
             return !(lhs == rhs);
         }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ConsoleApp1
+namespace EntityComponentState
 {
     public class Sprite : Component 
     { 
@@ -42,6 +42,11 @@ namespace ConsoleApp1
         public override void Deserialize(ByteQueue byteQueue)
         {
             spriteName = byteQueue.GetString();
+        }
+
+        public override string ToString()
+        {
+            return $"Entity ID: {entity.id} [{spriteName}]";
         }
     }
 }

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Component = EntityComponentState.Component;
 
-namespace ConsoleApp1
+namespace EntityComponentState
 {
     public class Entity
     {
-        public static Entity NULL = new Entity(-1);
+        public static readonly Entity NULL = new Entity(-1);
 
         public int id;
         public List<Component> components = new List<Component>();
@@ -25,11 +26,11 @@ namespace ConsoleApp1
         {
             var newEntityData = new Entity(this.id);
             foreach (var component in components)
-                newEntityData.AddComponents(component.Clone());
+                newEntityData.AddComponent(component.Clone());
             return newEntityData;
         }
 
-        public void AddComponents(params Component[] components)
+        public void AddComponent(params Component[] components)
         {
             if (components == null)
                 throw new ArgumentNullException("Cannot Entity.AddComponents(null)");
@@ -41,6 +42,15 @@ namespace ConsoleApp1
             this.components.AddRange(components);
             foreach (var component in components)
                 component.entity = this;
+        }
+
+        public void RemoveComponent(params Component[] components)
+        {
+            foreach (var component in components)
+            {
+                this.components.Remove(component);
+                component.entity = Entity.NULL;
+            }
         }
 
         public void Destroy()
