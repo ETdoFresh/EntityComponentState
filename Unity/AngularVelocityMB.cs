@@ -8,10 +8,12 @@ namespace EntityComponentState.Unity
     {
         public UnityVector3 value;
         public AngularVelocity angularVelocity;
+        public new Rigidbody rigidbody;
 
         private void OnEnable()
         {
             entity = GetComponent<EntityMB>().entity;
+            rigidbody = GetComponent<Rigidbody>();
 
             if (entity.HasComponent<AngularVelocity>())
                 angularVelocity = entity.GetComponent<AngularVelocity>();
@@ -29,9 +31,9 @@ namespace EntityComponentState.Unity
 
         private void Update()
         {
-            value.x = angularVelocity.X = transform.position.x;
-            value.y = angularVelocity.Y = transform.position.y;
-            value.z = angularVelocity.Z = transform.position.z;
+            value.x = angularVelocity.X = rigidbody.angularVelocity.x;
+            value.y = angularVelocity.Y = rigidbody.angularVelocity.y;
+            value.z = angularVelocity.Z = rigidbody.angularVelocity.z;
         }
     }
 }

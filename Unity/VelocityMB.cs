@@ -8,10 +8,12 @@ namespace EntityComponentState.Unity
     {
         public UnityVector3 value;
         public Velocity velocity;
+        public Rigidbody rigidbody;
 
         private void OnEnable()
         {
             entity = GetComponent<EntityMB>().entity;
+            rigidbody = GetComponent<Rigidbody>();
             if (velocity == null) velocity = new Velocity();
             entity.AddComponent(velocity);
         }
@@ -23,9 +25,9 @@ namespace EntityComponentState.Unity
 
         private void Update()
         {
-            value.x = velocity.X = transform.position.x;
-            value.y = velocity.Y = transform.position.y;
-            value.z = velocity.Z = transform.position.z;
+            value.x = velocity.X = rigidbody.velocity.x;
+            value.y = velocity.Y = rigidbody.velocity.y;
+            value.z = velocity.Z = rigidbody.velocity.z;
         }
     }
 }

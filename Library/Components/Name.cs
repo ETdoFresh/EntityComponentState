@@ -2,7 +2,7 @@
 {
     public class Name : Component
     {
-        public string name;
+        public string name = "";
 
         public override Component Clone()
         {
