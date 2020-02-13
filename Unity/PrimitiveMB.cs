@@ -29,7 +29,7 @@ namespace EntityComponentState.Unity
         {
             var meshName = meshFilter.mesh.name;
             if (meshName.StartsWith("Sphere"))
-                primitive.primitiveType = PrimitiveType.Cube;
+                primitive.primitiveType = PrimitiveType.Sphere;
             else if (meshName.StartsWith("Capsule"))
                 primitive.primitiveType = PrimitiveType.Capsule;
             else if (meshName.StartsWith("Cylinder"))

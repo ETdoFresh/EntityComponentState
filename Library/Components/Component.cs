@@ -15,7 +15,8 @@ namespace EntityComponentState
             typeof(AngularVelocity),
             typeof(Sprite),
             typeof(AnimationFrame),
-            typeof(Primitive)
+            typeof(Primitive),
+            typeof(Name)
         };
 
         public Entity entity = Entity.NULL;

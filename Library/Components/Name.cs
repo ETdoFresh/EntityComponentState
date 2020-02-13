@@ -1,65 +1,63 @@
 ﻿namespace EntityComponentState
 {
-    public class Primitive : Component
+    public class Name : Component
     {
-        public enum PrimitiveType { Sphere, Capsule, Cylinder, Cube, Plane, Quad }
-
-        public PrimitiveType primitiveType;
+        public string name;
 
         public override Component Clone()
         {
-            var newComponent = new Primitive();
+            var newComponent = new Name();
             newComponent.entity = entity;
-            newComponent.primitiveType = primitiveType;
+            newComponent.name = name;
             return newComponent;
         }
 
         public override void CopyValuesFrom(Component component)
         {
-            primitiveType = ((Primitive)component).primitiveType;
+            name = ((Name)component).name;
         }
 
         public override string ToByteHexString()
         {
-            return ((byte)primitiveType).ToByteHexString();
+            return name.ToByteHexString();
         }
 
         public override string ToCompressedByteHexString()
         {
-            return ((byte)primitiveType).ToByteHexString();
+            return name.ToByteHexString();
         }
 
         public override byte[] ToBytes()
         {
-            return ((byte)primitiveType).ToBytes();
+            return name.ToBytes();
         }
 
         public override byte[] ToCompressedBytes()
         {
-            return ((byte)primitiveType).ToBytes();
+            return name.ToBytes();
         }
 
         public override void Deserialize(ByteQueue byteQueue)
         {
-            primitiveType = ((PrimitiveType)byteQueue.GetByte());
+            name = byteQueue.GetString();
         }
 
         public override string ToString()
         {
-            return $"Entity ID: {entity.id} [{primitiveType.ToString()}]";
+            return $"Entity ID: {entity.id} [{name}]";
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is Primitive other)
-                return primitiveType == other.primitiveType;
+            if (obj is Name other)
+                return name == other.name;
             else
                 return false;
         }
 
         public override int GetHashCode()
         {
-            return primitiveType.GetHashCode();
+            return name.GetHashCode();
         }
     }
 }

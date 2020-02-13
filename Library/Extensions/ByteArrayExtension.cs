@@ -63,7 +63,7 @@ namespace EntityComponentState
 
         public static string ToByteHexString(this string value)
         {
-            return value.ToByteHexString() + Encoding.UTF8.GetBytes(value);
+            return value.Length.ToByteHexString() + Encoding.UTF8.GetBytes(value).ToHexString();
         }
 
         public static byte[] ToBytes(this byte value)
