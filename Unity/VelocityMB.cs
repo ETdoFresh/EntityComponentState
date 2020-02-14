@@ -8,7 +8,7 @@ namespace EntityComponentState.Unity
     {
         public UnityVector3 value;
         public Velocity velocity;
-        public Rigidbody rigidbody;
+        public new Rigidbody rigidbody;
 
         private void OnEnable()
         {
