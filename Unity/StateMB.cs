@@ -25,6 +25,8 @@ namespace EntityComponentState.Unity
                 var startState = state;
                 GetState();
                 var deltaState = new DeltaState(startState, state);
+
+                // Create lots of garbage for GC
                 deltaStateString = deltaState.ToString();
                 deltaStateBytes = deltaState.ToCompressedByteHexString();
             }
@@ -34,9 +36,10 @@ namespace EntityComponentState.Unity
 
         public void GetState()
         {
-            state = new State();
-            state.tick = tick;
+            state = new State { tick = tick };
             state.entities.AddRange(FindObjectsOfType<EntityMB>().Select(e => e.entity.Clone()).OrderBy(e => e.id));
+
+            // Create lots of garbage for GC
             stateString = state.ToString();
             stateBytes = state.ToCompressedByteHexString();
         }
