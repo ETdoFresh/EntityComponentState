@@ -6,6 +6,7 @@ namespace EntityComponentState.Unity
     public class StateMB : MonoBehaviour
     {
         public State state;
+        public DeltaState deltaState;
         public int tick;
         [Multiline(20)] public string stateString;
         [Multiline(3)] public string stateBytes;
@@ -20,18 +21,13 @@ namespace EntityComponentState.Unity
 
         public void GetDeltaState()
         {
-            if (state != null)
-            {
-                var startState = state;
-                GetState();
-                var deltaState = new DeltaState(startState, state);
+            var startState = state != null ? state : new State();
+            GetState();
+            deltaState = new DeltaState(startState, state);
 
-                // Create lots of garbage for GC
-                deltaStateString = deltaState.ToString();
-                deltaStateBytes = deltaState.ToCompressedByteHexString();
-            }
-            else
-                GetState();
+            // Create lots of garbage for GC
+            deltaStateString = deltaState.ToString();
+            deltaStateBytes = deltaState.ToCompressedByteHexString();
         }
 
         public void GetState()

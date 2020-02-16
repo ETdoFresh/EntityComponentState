@@ -4,16 +4,16 @@ using UnityEngine;
 
 namespace EntityComponentState.Unity
 {
-    public class StateToGameObject : MonoBehaviour
+    public class DeltaStateToGameObject : MonoBehaviour
     {
         public StateMB stateMB;
         public List<StateClone> clones = new List<StateClone>();
 
-        public State State => stateMB != null ? stateMB.state : null;
+        public DeltaState DeltaState => stateMB != null ? stateMB.deltaState : null;
 
         private void Update()
         {
-            if (State != null)
+            if (DeltaState != null)
             {
                 SpawnEntities();
                 DespawnEntities();
@@ -23,7 +23,7 @@ namespace EntityComponentState.Unity
 
         private void SpawnEntities()
         {
-            var spawns = State.entities.Where(entity => !clones.Any(clone => clone.entityId == entity.id));
+            var spawns = DeltaState.spawns;
             foreach (var spawn in spawns)
             {
                 GameObject newGameObject = null;
@@ -54,19 +54,21 @@ namespace EntityComponentState.Unity
 
         private void DespawnEntities()
         {
-            var despawns = clones.Where(clone => !State.entities.Any(entity => clone.entityId == entity.id));
-            foreach (var despawn in despawns)
+            foreach (var despawn in DeltaState.despawns)
             {
-                clones.Remove(despawn);
-                Destroy(despawn.gameObject);
+                var clone = clones.FirstOrDefault(c => c.entityId == despawn.id);
+                if (clone == null) continue;
+                clones.Remove(clone);
+                Destroy(clone.gameObject);
             }
         }
 
         private void ApplyChangesToEntites()
         {
-            foreach (var entity in State.entities)
+            foreach (var entity in DeltaState.endState.entities)
             {
-                var clone = clones.First(c => c.entityId == entity.id);
+                var clone = clones.FirstOrDefault(c => c.entityId == entity.id);
+                if (clone == null) continue;
                 foreach (var component in entity.components)
                     component.Apply(clone.gameObject);
             }
