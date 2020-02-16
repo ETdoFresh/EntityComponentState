@@ -14,6 +14,17 @@ namespace EntityComponentState.Unity
             return new Quaternion(vector4.x, vector4.y, vector4.z, vector4.w);
         }
 
+        public static PrimitiveType ToUnityPrimitiveType(this Primitive.PrimitiveType primitiveType)
+        {
+            if (primitiveType == Primitive.PrimitiveType.Capsule) return PrimitiveType.Capsule;
+            if (primitiveType == Primitive.PrimitiveType.Cube) return PrimitiveType.Cube;
+            if (primitiveType == Primitive.PrimitiveType.Cylinder) return PrimitiveType.Cylinder;
+            if (primitiveType == Primitive.PrimitiveType.Plane) return PrimitiveType.Plane;
+            if (primitiveType == Primitive.PrimitiveType.Quad) return PrimitiveType.Quad;
+            if (primitiveType == Primitive.PrimitiveType.Sphere) return PrimitiveType.Sphere;
+            throw new System.ArgumentException();
+        }
+
         public static void Apply(this Component component, GameObject gameObject)
         {
             if (component is Position position)
@@ -50,9 +61,12 @@ namespace EntityComponentState.Unity
                 gameObject.name = name.name;
                 return;
             }
-            //if (component is Primitive primitive)
-            //{
-            //}
+            if (component is Primitive primitive)
+            {
+                var meshFilter = gameObject.GetComponent<MeshFilter>();
+                if (!meshFilter) return;
+                meshFilter.sharedMesh = MeshHelper.GetMesh(primitive.primitiveType.ToUnityPrimitiveType());
+            }
         }
     }
 }
