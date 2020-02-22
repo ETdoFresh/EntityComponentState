@@ -1,11 +1,24 @@
-﻿using EntityComponentState;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace EntityComponentState
 {
     public abstract class Component : IToBytes
     {
+        private static Type Type => typeof(Component);
+        private static IEnumerable<Type> allTypes;
+        public static IEnumerable<Type> ALL_TYPES
+        {
+            get
+            {
+                if (allTypes == null)
+                    return (allTypes = Type.Assembly.GetTypes().Where(otherType => Type.IsAssignableFrom(otherType)));
+                else
+                    return allTypes;
+            }
+        }
+
         public Entity entity = Entity.NULL;
 
         public abstract Component Clone();
@@ -46,7 +59,7 @@ namespace EntityComponentState
         public abstract ByteQueue ToBytes();
 
         public abstract void FromBytes(ByteQueue bytes);
-        
+
         public abstract byte[] ToCompressedBytes();
 
         public abstract void CopyValuesFrom(Component component);

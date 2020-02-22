@@ -9,7 +9,7 @@ namespace EntityComponentState
     {
         public int tick;
         public SerializableList<Entity> entities;
-        [NonSerialized] public List<Type> types;
+        [NonSerialized] public IEnumerable<Type> types;
 
         public State()
         {
