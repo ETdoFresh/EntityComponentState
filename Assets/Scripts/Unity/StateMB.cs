@@ -8,10 +8,10 @@ namespace EntityComponentState.Unity
         public State state;
         public DeltaState deltaState;
         public int tick;
-        [Multiline(20)] public string stateString;
-        [Multiline(3)] public string stateBytes;
-        [Multiline(40)] public string deltaStateString;
-        [Multiline(3)] public string deltaStateBytes;
+        [TextArea(1, 20)] public string stateString;
+        [TextArea(1, 20)] public string stateBytes;
+        [TextArea(1, 20)] public string deltaStateString;
+        [TextArea(1, 20)] public string deltaStateBytes;
 
         private void Update()
         {
@@ -37,7 +37,7 @@ namespace EntityComponentState.Unity
 
             // Create lots of garbage for GC
             stateString = state.ToString();
-            stateBytes = state.ToCompressedByteHexString();
+            stateBytes = state.ToBytes().ToHexString();
         }
     }
 

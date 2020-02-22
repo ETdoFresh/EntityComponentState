@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class WriteStateToFile : MonoBehaviour
 {
-    public const string FILE = @"C:\Users\etgarci1\Desktop\EntityComponentState\state.bin";
+    public const string FILE = @"D:\Desktop\EntityComponentState\state.bin";
     public StateMB stateMB;
     private FileStream file;
 

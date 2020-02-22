@@ -6,19 +6,6 @@ namespace EntityComponentState
 {
     public abstract class Component : IToBytes
     {
-        public static List<Type> types = new List<Type>
-        {
-            typeof(Position),
-            typeof(Rotation),
-            typeof(Scale),
-            typeof(Velocity),
-            typeof(AngularVelocity),
-            typeof(Sprite),
-            typeof(AnimationFrame),
-            typeof(Primitive),
-            typeof(Name)
-        };
-
         public Entity entity = Entity.NULL;
 
         public abstract Component Clone();

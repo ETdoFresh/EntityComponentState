@@ -8,6 +8,7 @@ namespace EntityComponentState
     public class ByteQueue : List<byte>
     {
         public ByteQueue() : base() { }
+        public ByteQueue(IEnumerable<byte> bytes) : base(bytes) { }
         public ByteQueue(byte value) : base() { Enqueue(value); }
         public ByteQueue(bool value) : base() { Enqueue(value); }
         public ByteQueue(short value) : base() { Enqueue(value); }
@@ -18,16 +19,6 @@ namespace EntityComponentState
         public ByteQueue(double value) : base() { Enqueue(value); }
         public ByteQueue(string value) : base() { Enqueue(value); }
         public ByteQueue(IToBytes value) : base() { Enqueue(value); }
-        public ByteQueue(IEnumerable<byte> values) : base() { Enqueue(values); }
-        public ByteQueue(IEnumerable<bool> values) : base() { Enqueue(values); }
-        public ByteQueue(IEnumerable<short> values) : base() { Enqueue(values); }
-        public ByteQueue(IEnumerable<ushort> values) : base() { Enqueue(values); }
-        public ByteQueue(IEnumerable<int> values) : base() { Enqueue(values); }
-        public ByteQueue(IEnumerable<uint> values) : base() { Enqueue(values); }
-        public ByteQueue(IEnumerable<float> values) : base() { Enqueue(values); }
-        public ByteQueue(IEnumerable<double> values) : base() { Enqueue(values); }
-        public ByteQueue(IEnumerable<string> values) : base() { Enqueue(values); }
-        public ByteQueue(IEnumerable<IToBytes> values) : base() { Enqueue(values); }
 
         public byte GetByte()
         {
@@ -175,18 +166,8 @@ namespace EntityComponentState
         public void Enqueue(uint value) => AddRange(BitConverter.GetBytes(value));
         public void Enqueue(float value) => AddRange(BitConverter.GetBytes(value));
         public void Enqueue(double value) => AddRange(BitConverter.GetBytes(value));
-        public void Enqueue(IToBytes value) { Enqueue(value.GetType().FullName); AddRange(value.ToBytes()); }
         public void Enqueue(string value) { AddRange(BitConverter.GetBytes(value.Length)); AddRange(Encoding.UTF8.GetBytes(value)); }
-        public void Enqueue(IEnumerable<byte> values) { Enqueue(values.Count()); foreach(var value in values) Enqueue(value); }
-        public void Enqueue(IEnumerable<bool> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
-        public void Enqueue(IEnumerable<short> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
-        public void Enqueue(IEnumerable<ushort> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
-        public void Enqueue(IEnumerable<int> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
-        public void Enqueue(IEnumerable<uint> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
-        public void Enqueue(IEnumerable<float> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
-        public void Enqueue(IEnumerable<double> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
-        public void Enqueue(IEnumerable<string> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
-        public void Enqueue(IEnumerable<IToBytes> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
+        public void Enqueue(IToBytes value) { Enqueue(value.GetType().FullName); AddRange(value.ToBytes()); }
 
         public string ToHexString()
         {

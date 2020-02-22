@@ -12,9 +12,22 @@ namespace EntityComponentState
         public List<Entity> spawns = new List<Entity>();
         private readonly List<Change> changes = new List<Change>();
         public List<Entity> despawns = new List<Entity>();
+        public List<Type> types;
 
         public DeltaState(State startState, State endState)
         {
+            types = new List<Type>
+            {
+                typeof(Position),
+                typeof(Rotation),
+                typeof(Scale),
+                typeof(Velocity),
+                typeof(AngularVelocity),
+                typeof(Sprite),
+                typeof(AnimationFrame),
+                typeof(Primitive),
+                typeof(Name)
+            };
             this.startState = startState;
             this.endState = endState;
             tick = endState.tick;
@@ -48,7 +61,7 @@ namespace EntityComponentState
 
             endState.entities.AddRange(startState.entities.Union(spawns).Except(despawns).OrderBy(entity => entity.id));
 
-            foreach (var componentType in Component.types)
+            foreach (var componentType in types)
             {
                 var currentIndex = 0;
                 while (currentIndex < endState.entities.Count)
@@ -76,7 +89,7 @@ namespace EntityComponentState
                 tick = tick
             };
             endState.entities.AddRange(startState.entities.Union(spawns).Except(despawns).OrderBy(entity => entity.id));
-            foreach (var componentType in Component.types)
+            foreach (var componentType in types)
                 foreach (var entity in endState.entities)
                 {
                     var change = changes.Where(c => c.entityId == entity.id && c.componentType == componentType).FirstOrDefault();
@@ -91,7 +104,7 @@ namespace EntityComponentState
 
         private void AddUpdates()
         {
-            foreach (var componentType in Component.types)
+            foreach (var componentType in types)
                 foreach (var endStateEntity in endState.entities)
                 {
                     var change = new Change { componentType = componentType, entityId = endStateEntity.id };
@@ -130,7 +143,7 @@ namespace EntityComponentState
 
             output += "\r\n";
 
-            foreach (var componentType in Component.types)
+            foreach (var componentType in types)
             {
                 var componentChanges = changes.Where(change => change.componentType == componentType);
                 output += $"  {componentType.Name} [Count: {componentChanges.Count()}]\r\n";
@@ -158,7 +171,7 @@ namespace EntityComponentState
             foreach (var entity in despawns)
                 output += $" {((byte)entity.id).ToByteHexString()}";
 
-            foreach (var componentType in Component.types)
+            foreach (var componentType in types)
             {
                 var componentChanges = changes.Where(change => change.componentType == componentType);
 
@@ -201,7 +214,7 @@ namespace EntityComponentState
             foreach (var entity in despawns)
                 output += $" {entity.id.ToByteHexString()}";
 
-            foreach (var componentType in Component.types)
+            foreach (var componentType in types)
             {
                 var componentChanges = changes.Where(change => change.componentType == componentType);
 
@@ -244,7 +257,7 @@ namespace EntityComponentState
             foreach (var entity in despawns)
                 bytes.AddRange(entity.id.ToBytes());
 
-            foreach (var componentType in Component.types)
+            foreach (var componentType in types)
             {
                 var componentChanges = changes.Where(change => change.componentType == componentType);
 
@@ -286,7 +299,7 @@ namespace EntityComponentState
             foreach (var entity in despawns)
                 bytes.AddRange(((byte)entity.id).ToBytes());
 
-            foreach (var componentType in Component.types)
+            foreach (var componentType in types)
             {
                 var componentChanges = changes.Where(change => change.componentType == componentType);
 

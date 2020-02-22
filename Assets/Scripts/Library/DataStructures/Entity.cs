@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Component = EntityComponentState.Component;
 
 namespace EntityComponentState
 {
@@ -11,6 +10,8 @@ namespace EntityComponentState
         public static readonly Entity NULL = new Entity(-1);
 
         public int id = -1;
+        
+        [NonSerialized] 
         public List<Component> components = new List<Component>();
 
         public Entity() { }

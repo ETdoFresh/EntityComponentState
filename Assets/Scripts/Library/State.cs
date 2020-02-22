@@ -8,9 +8,27 @@ namespace EntityComponentState
     public class State : IToBytes
     {
         public int tick;
-        public List<Entity> entities = new List<Entity>();
+        public SerializableList<Entity> entities;
+        [NonSerialized] public List<Type> types;
 
-        public static State Create(int tick, List<Entity> entities)
+        public State()
+        {
+            entities = new SerializableList<Entity>();
+            types = new List<Type>
+            {
+                typeof(Position),
+                typeof(Rotation),
+                typeof(Scale),
+                typeof(Velocity),
+                typeof(AngularVelocity),
+                typeof(Sprite),
+                typeof(AnimationFrame),
+                typeof(Primitive),
+                typeof(Name)
+            };
+        }
+
+        public static State Create(int tick, IEnumerable<Entity> entities)
         {
             var newState = new State
             {
@@ -45,7 +63,7 @@ namespace EntityComponentState
         public override string ToString()
         {
             var output = $"State [Tick: {tick}]\r\n";
-            foreach (var componentType in Component.types)
+            foreach (var componentType in types)
             {
                 output += $"  {componentType.Name} [Count: {GetCount(componentType)}]\r\n";
                 foreach (var component in GetComponents(componentType))
@@ -61,9 +79,9 @@ namespace EntityComponentState
             bytes.Enqueue(tick);
             bytes.Enqueue(entities);
 
-            foreach (var componentType in Component.types)
+            foreach (var componentType in types)
             {
-                foreach(var entity in entities)
+                foreach (var entity in entities)
                 {
                     var hasComponent = entity.HasComponent(componentType);
                     bytes.Enqueue(hasComponent);
@@ -80,9 +98,9 @@ namespace EntityComponentState
             entities.Clear();
             entities.AddRange(bytes.GetIToBytess<Entity>());
 
-            foreach (var componentType in Component.types)
+            foreach (var componentType in types)
             {
-                foreach(var entity in entities)
+                foreach (var entity in entities)
                 {
                     var hasComponent = bytes.GetBool();
                     if (hasComponent)
@@ -90,49 +108,25 @@ namespace EntityComponentState
                 }
             }
         }
+    }
 
-        public byte[] ToCompressedBytes()
+    public class CompressedState : State
+    {
+        public CompressedState()
         {
-            var bytes = new List<byte>();
-            bytes.AddRange(tick.ToBytes());
-
-            foreach (var componentType in Component.types)
+            entities = new SerializableListByteCount<Entity>();
+            types = new List<Type>
             {
-                bytes.AddRange(((byte)GetCount(componentType)).ToBytes());
-                foreach (var component in GetComponents(componentType))
-                    bytes.AddRange(component.ToBytes());
-            }
-            return bytes.ToArray();
-        }
-
-        public string ToByteHexString()
-        {
-            var output = "";
-            output += tick.ToByteHexString();
-
-            foreach (var componentType in Component.types)
-            {
-                output += $" {BitConverter.GetBytes(GetCount(componentType)).ToHexString()}";
-                foreach (var component in GetComponents(componentType))
-                    output += $" {component.ToByteHexString()}";
-            }
-            var count = output.Replace(" ", "").Length / 2;
-            return $"{output} [{count}]";
-        }
-
-        public string ToCompressedByteHexString()
-        {
-            var output = "";
-            output += tick.ToByteHexString();
-
-            foreach (var componentType in Component.types)
-            {
-                output += $" {BitConverter.GetBytes((byte)GetCount(componentType)).ToHexString()}";
-                foreach (var component in GetComponents(componentType))
-                    output += $" {component.ToCompressedByteHexString()}";
-            }
-            var count = output.Replace(" ", "").Length / 2;
-            return $"{output} [{count}]";
+                typeof(CompressedPosition),
+                typeof(CompressedRotation),
+                typeof(CompressedScale),
+                typeof(CompressedVelocity),
+                typeof(CompressedAngularVelocity),
+                typeof(Sprite),
+                typeof(AnimationFrame),
+                typeof(Primitive),
+                typeof(Name)
+            };
         }
     }
 }

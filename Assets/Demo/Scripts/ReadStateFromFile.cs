@@ -29,7 +29,7 @@ public class ReadStateFromFile : MonoBehaviour
             var bytes = new byte[file.Length];
             file.Position = 0;
             file.Read(bytes, 0, (int)file.Length);
-            state.FromBytes(bytes.ToByteQueue());
+            state.FromBytes(new ByteQueue(bytes));
             SpawnEntities();
             DespawnEntities();
             ApplyChangesToEntites();
