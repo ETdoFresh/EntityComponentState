@@ -5,7 +5,8 @@ using Component = EntityComponentState.Component;
 
 namespace EntityComponentState
 {
-    public class Entity
+    [Serializable]
+    public class Entity : IToBytes
     {
         public static readonly Entity NULL = new Entity(-1);
 
@@ -112,6 +113,16 @@ namespace EntityComponentState
         public override int GetHashCode()
         {
             return id;
+        }
+
+        public ByteQueue ToBytes()
+        {
+            return new ByteQueue(id);
+        }
+
+        public void FromBytes(ByteQueue bytes)
+        {
+            id = bytes.GetInt();
         }
     }
 }

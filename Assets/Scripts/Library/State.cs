@@ -4,7 +4,8 @@ using System.Linq;
 
 namespace EntityComponentState
 {
-    public class State
+    [Serializable]
+    public class State : IToBytes
     {
         public int tick;
         public List<Entity> entities = new List<Entity>();
@@ -54,18 +55,40 @@ namespace EntityComponentState
             return output;
         }
 
-        public byte[] ToBytes()
+        public ByteQueue ToBytes()
         {
-            var bytes = new List<byte>();
-            bytes.AddRange(tick.ToBytes());
+            var bytes = new ByteQueue();
+            bytes.Enqueue(tick);
+            bytes.Enqueue(entities);
 
             foreach (var componentType in Component.types)
             {
-                bytes.AddRange(GetCount(componentType).ToBytes());
-                foreach (var component in GetComponents(componentType))
-                    bytes.AddRange(component.ToBytes());
+                foreach(var entity in entities)
+                {
+                    var hasComponent = entity.HasComponent(componentType);
+                    bytes.Enqueue(hasComponent);
+                    if (hasComponent)
+                        bytes.Enqueue(entity.GetComponent(componentType));
+                }
             }
-            return bytes.ToArray();
+            return bytes;
+        }
+
+        public void FromBytes(ByteQueue bytes)
+        {
+            tick = bytes.GetInt();
+            entities.Clear();
+            entities.AddRange(bytes.GetIToBytess<Entity>());
+
+            foreach (var componentType in Component.types)
+            {
+                foreach(var entity in entities)
+                {
+                    var hasComponent = bytes.GetBool();
+                    if (hasComponent)
+                        entity.AddComponent(bytes.GetIToBytes<Component>());
+                }
+            }
         }
 
         public byte[] ToCompressedBytes()

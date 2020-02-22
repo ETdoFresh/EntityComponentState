@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace EntityComponentState
 {
-    public abstract class Component
+    public abstract class Component : IToBytes
     {
         public static List<Type> types = new List<Type>
         {
@@ -56,7 +56,9 @@ namespace EntityComponentState
 
         public abstract void Deserialize(ByteQueue byteQueue);
 
-        public abstract byte[] ToBytes();
+        public abstract ByteQueue ToBytes();
+
+        public abstract void FromBytes(ByteQueue bytes);
         
         public abstract byte[] ToCompressedBytes();
 

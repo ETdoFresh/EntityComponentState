@@ -29,9 +29,14 @@
             return ((byte)primitiveType).ToByteHexString();
         }
 
-        public override byte[] ToBytes()
+        public override ByteQueue ToBytes()
         {
-            return ((byte)primitiveType).ToBytes();
+            return new ByteQueue((byte)primitiveType);
+        }
+
+        public override void FromBytes(ByteQueue bytes)
+        {
+            primitiveType = (PrimitiveType)bytes.GetByte();
         }
 
         public override byte[] ToCompressedBytes()
@@ -46,7 +51,7 @@
 
         public override string ToString()
         {
-            return $"Entity ID: {entity.id} [{primitiveType.ToString()}]";
+            return $"[{entity.id}][{primitiveType.ToString()}][{GetType().Name}]";
         }
 
         public override bool Equals(object obj)

@@ -7,15 +7,27 @@ namespace EntityComponentState
 {
     public class ByteQueue : List<byte>
     {
-        public ByteQueue(byte[] bytes) : base(bytes) { }
-
-        public int GetInt32()
-        {
-            var size = 4;
-            var value = BitConverter.ToInt32(this.Take(size).ToArray(), 0);
-            RemoveRange(0, size);
-            return value;
-        }
+        public ByteQueue() : base() { }
+        public ByteQueue(byte value) : base() { Enqueue(value); }
+        public ByteQueue(bool value) : base() { Enqueue(value); }
+        public ByteQueue(short value) : base() { Enqueue(value); }
+        public ByteQueue(ushort value) : base() { Enqueue(value); }
+        public ByteQueue(int value) : base() { Enqueue(value); }
+        public ByteQueue(uint value) : base() { Enqueue(value); }
+        public ByteQueue(float value) : base() { Enqueue(value); }
+        public ByteQueue(double value) : base() { Enqueue(value); }
+        public ByteQueue(string value) : base() { Enqueue(value); }
+        public ByteQueue(IToBytes value) : base() { Enqueue(value); }
+        public ByteQueue(IEnumerable<byte> values) : base() { Enqueue(values); }
+        public ByteQueue(IEnumerable<bool> values) : base() { Enqueue(values); }
+        public ByteQueue(IEnumerable<short> values) : base() { Enqueue(values); }
+        public ByteQueue(IEnumerable<ushort> values) : base() { Enqueue(values); }
+        public ByteQueue(IEnumerable<int> values) : base() { Enqueue(values); }
+        public ByteQueue(IEnumerable<uint> values) : base() { Enqueue(values); }
+        public ByteQueue(IEnumerable<float> values) : base() { Enqueue(values); }
+        public ByteQueue(IEnumerable<double> values) : base() { Enqueue(values); }
+        public ByteQueue(IEnumerable<string> values) : base() { Enqueue(values); }
+        public ByteQueue(IEnumerable<IToBytes> values) : base() { Enqueue(values); }
 
         public byte GetByte()
         {
@@ -33,6 +45,54 @@ namespace EntityComponentState
             return value;
         }
 
+        public short GetShort()
+        {
+            var size = 2;
+            var value = BitConverter.ToInt16(this.Take(size).ToArray(), 0);
+            RemoveRange(0, size);
+            return value;
+        }
+
+        public ushort GetUShort()
+        {
+            var size = 2;
+            var value = BitConverter.ToUInt16(this.Take(size).ToArray(), 0);
+            RemoveRange(0, size);
+            return value;
+        }
+
+        public int GetInt()
+        {
+            var size = 4;
+            var value = BitConverter.ToInt32(this.Take(size).ToArray(), 0);
+            RemoveRange(0, size);
+            return value;
+        }
+
+        public uint GetUInt()
+        {
+            var size = 4;
+            var value = BitConverter.ToUInt32(this.Take(size).ToArray(), 0);
+            RemoveRange(0, size);
+            return value;
+        }
+
+        public float GetFloat()
+        {
+            var size = 4;
+            var value = BitConverter.ToSingle(this.Take(size).ToArray(), 0);
+            RemoveRange(0, size);
+            return value;
+        }
+
+        public double GetDouble()
+        {
+            var size = 8;
+            var value = BitConverter.ToDouble(this.Take(size).ToArray(), 0);
+            RemoveRange(0, size);
+            return value;
+        }
+
         public string GetString()
         {
             var count = BitConverter.ToInt32(this.Take(4).ToArray(), 0);
@@ -41,17 +101,47 @@ namespace EntityComponentState
             return value;
         }
 
-        public float GetSingle()
+        public T GetIToBytes<T>() where T : IToBytes
         {
-            var size = 4;
-            var value = BitConverter.ToSingle(this.Take(size).ToArray(), 0);
-            RemoveRange(0, size);
-            return value;
+            var fullName = GetString();
+            var type = typeof(IToBytes).Assembly.GetType(fullName);
+            var instance = (T)Activator.CreateInstance(type);
+            instance.FromBytes(this);
+            return instance;
         }
+
+        public IEnumerable<byte> GetBytes()
+        {
+            var count = GetInt();
+            for (int i = 0; i < count; i++)
+                yield return GetByte();
+        }
+
+        public IEnumerable<bool> GetBools()
+        {
+            var count = GetInt();
+            for (int i = 0; i < count; i++)
+                yield return GetBool();
+        }
+
+        public IEnumerable<short> GetShorts()
+        {
+            var count = GetInt();
+            for (int i = 0; i < count; i++)
+                yield return GetShort();
+        }
+
+        public IEnumerable<T> GetIToBytess<T>() where T : IToBytes
+        {
+            var count = GetInt();
+            for (int i = 0; i < count; i++)
+                yield return GetIToBytes<T>();
+        }
+
 
         public float GetCompressedSingle(float minRange, float maxRange, int bytes)
         {
-            if (bytes >= 4) return GetSingle();
+            if (bytes >= 4) return GetFloat();
             var range = maxRange - minRange;
             if (bytes == 1)
             {
@@ -75,6 +165,37 @@ namespace EntityComponentState
                 return normalized * unitIncrement + minRange;
             }
             throw new Exception("GetCompressedSingle(), bytes must be > 0");
+        }
+
+        public void Enqueue(byte value) => Add(value);
+        public void Enqueue(bool value) => AddRange(BitConverter.GetBytes(value));
+        public void Enqueue(short value) => AddRange(BitConverter.GetBytes(value));
+        public void Enqueue(ushort value) => AddRange(BitConverter.GetBytes(value));
+        public void Enqueue(int value) => AddRange(BitConverter.GetBytes(value));
+        public void Enqueue(uint value) => AddRange(BitConverter.GetBytes(value));
+        public void Enqueue(float value) => AddRange(BitConverter.GetBytes(value));
+        public void Enqueue(double value) => AddRange(BitConverter.GetBytes(value));
+        public void Enqueue(IToBytes value) { Enqueue(value.GetType().FullName); AddRange(value.ToBytes()); }
+        public void Enqueue(string value) { AddRange(BitConverter.GetBytes(value.Length)); AddRange(Encoding.UTF8.GetBytes(value)); }
+        public void Enqueue(IEnumerable<byte> values) { Enqueue(values.Count()); foreach(var value in values) Enqueue(value); }
+        public void Enqueue(IEnumerable<bool> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
+        public void Enqueue(IEnumerable<short> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
+        public void Enqueue(IEnumerable<ushort> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
+        public void Enqueue(IEnumerable<int> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
+        public void Enqueue(IEnumerable<uint> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
+        public void Enqueue(IEnumerable<float> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
+        public void Enqueue(IEnumerable<double> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
+        public void Enqueue(IEnumerable<string> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
+        public void Enqueue(IEnumerable<IToBytes> values) { Enqueue(values.Count()); foreach (var value in values) Enqueue(value); }
+
+        public string ToHexString()
+        {
+            var output = "";
+
+            foreach (var @byte in this)
+                output += $"{@byte:x2}";
+
+            return output;
         }
     }
 }

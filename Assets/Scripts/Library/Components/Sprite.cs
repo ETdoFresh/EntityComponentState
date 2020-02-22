@@ -29,9 +29,14 @@ namespace EntityComponentState
             return spriteName.ToByteHexString();
         }
 
-        public override byte[] ToBytes()
+        public override ByteQueue ToBytes()
         {
-            return spriteName.ToBytes();
+            return new ByteQueue(spriteName);
+        }
+
+        public override void FromBytes(ByteQueue bytes)
+        {
+            spriteName = bytes.GetString();
         }
 
         public override byte[] ToCompressedBytes()
@@ -46,7 +51,7 @@ namespace EntityComponentState
 
         public override string ToString()
         {
-            return $"Entity ID: {entity.id} [{spriteName}]";
+            return $"[{entity.id}][{spriteName}][{GetType().Name}]";
         }
     }
 }

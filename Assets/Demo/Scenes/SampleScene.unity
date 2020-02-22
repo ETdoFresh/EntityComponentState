@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.4465782, g: 0.49641252, b: 0.5748167, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -158,6 +158,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f746f1a4d145cf149b58218ec8b8138c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entity:
+    id: 5
   value: {x: 0, y: 0, z: 0}
 --- !u!114 &393665432
 MonoBehaviour:
@@ -171,6 +173,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce26c17c2c17491478170ec3436093f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entity:
+    id: 2
   id: 0
 --- !u!54 &393665433
 Rigidbody:
@@ -272,6 +276,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b10a81cd2e5d07542a53bf89c9b63922, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entity:
+    id: 1
   value: {x: 0, y: 0, z: 0}
 --- !u!114 &393665439
 MonoBehaviour:
@@ -285,6 +291,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e319d01d8d8a63f4e96f9f06c120f5d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entity:
+    id: 3
   value: {x: 0, y: 0, z: 0, w: 0}
 --- !u!114 &393665440
 MonoBehaviour:
@@ -298,6 +306,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d06ba0333806646489580eeb71932455, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entity:
+    id: 10
   value: 0
   meshFilter: {fileID: 0}
 --- !u!114 &393665441
@@ -312,6 +322,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e1e94dadc2ce614998d057258b3c386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entity:
+    id: 6
   value: 
 --- !u!1 &705507993
 GameObject:
@@ -433,6 +445,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0225bfb8ee781954584164e61f8ee5af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state:
+    tick: 0
+    entities: []
   tick: 0
   stateString: 
   stateBytes: 
@@ -590,6 +605,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1547086062}
   - component: {fileID: 1547086061}
+  - component: {fileID: 1547086063}
   m_Layer: 0
   m_Name: DeltaStateToGameObject
   m_TagString: Untagged
@@ -625,6 +641,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1547086063
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1547086060}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a20b814ca10337d41b9aed48de21fcba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stateMB: {fileID: 915070702}
+  states: []
+  bytes: 
 --- !u!1 &1963805442
 GameObject:
   m_ObjectHideFlags: 0
@@ -661,6 +692,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce26c17c2c17491478170ec3436093f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entity:
+    id: 7
   id: 0
 --- !u!65 &1963805444
 BoxCollider:
@@ -746,6 +779,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b10a81cd2e5d07542a53bf89c9b63922, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entity:
+    id: 9
   value: {x: 0, y: 0, z: 0}
 --- !u!114 &1963805449
 MonoBehaviour:
@@ -759,6 +794,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f746f1a4d145cf149b58218ec8b8138c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entity:
+    id: 8
   value: {x: 0, y: 0, z: 0}
 --- !u!114 &1963805450
 MonoBehaviour:
@@ -772,6 +809,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e1e94dadc2ce614998d057258b3c386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entity:
+    id: 0
   value: 
 --- !u!114 &1963805451
 MonoBehaviour:
@@ -785,5 +824,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d06ba0333806646489580eeb71932455, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entity:
+    id: 4
   value: 0
   meshFilter: {fileID: 0}

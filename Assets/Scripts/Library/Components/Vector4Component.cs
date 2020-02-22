@@ -54,7 +54,7 @@ namespace EntityComponentState
 
         public override string ToString()
         {
-            return $"Entity ID: {entity.id} [X: {X}, Y: {Y}, Z: {Z}, W: {W}]";
+            return $"[{entity.id}][X: {X}, Y: {Y}, Z: {Z}, W: {W}][{GetType().Name}]";
         }
 
         public override string ToByteHexString()
@@ -75,14 +75,22 @@ namespace EntityComponentState
             return output;
         }
 
-        public override byte[] ToBytes()
+        public override ByteQueue ToBytes()
         {
-            var output = new List<byte>();
-            output.AddRange(X.ToBytes());
-            output.AddRange(Y.ToBytes());
-            output.AddRange(Z.ToBytes());
-            output.AddRange(W.ToBytes());
-            return output.ToArray();
+            var output = new ByteQueue();
+            output.Enqueue(X);
+            output.Enqueue(Y);
+            output.Enqueue(Z);
+            output.Enqueue(W);
+            return output;
+        }
+
+        public override void FromBytes(ByteQueue bytes)
+        {
+            X = bytes.GetFloat();
+            Y = bytes.GetFloat();
+            Z = bytes.GetFloat();
+            W = bytes.GetFloat();
         }
 
         public override byte[] ToCompressedBytes()
@@ -97,10 +105,10 @@ namespace EntityComponentState
 
         public override void Deserialize(ByteQueue byteQueue)
         {
-            X = byteQueue.GetSingle();
-            Y = byteQueue.GetSingle();
-            Z = byteQueue.GetSingle();
-            W = byteQueue.GetSingle();
+            X = byteQueue.GetFloat();
+            Y = byteQueue.GetFloat();
+            Z = byteQueue.GetFloat();
+            W = byteQueue.GetFloat();
         }
     }
 }

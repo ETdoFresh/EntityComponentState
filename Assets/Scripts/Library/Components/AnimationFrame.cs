@@ -29,9 +29,14 @@ namespace EntityComponentState
             return ((byte)frame).ToByteHexString();
         }
 
-        public override byte[] ToBytes()
+        public override ByteQueue ToBytes()
         {
-            return frame.ToBytes();
+            return new ByteQueue(frame);
+        }
+
+        public override void FromBytes(ByteQueue bytes)
+        {
+            frame = bytes.GetInt();
         }
 
         public override byte[] ToCompressedBytes()
@@ -41,12 +46,12 @@ namespace EntityComponentState
 
         public override void Deserialize(ByteQueue byteQueue)
         {
-            frame = byteQueue.GetInt32();
+            frame = byteQueue.GetInt();
         }
 
         public override string ToString()
         {
-            return $"Entity ID: {entity.id} [{frame}]";
+            return $"[{entity.id}][{frame}][{GetType().Name}]";
         }
     }
 }

@@ -34,17 +34,17 @@ namespace EntityComponentState
             this.startState = startState;
             this.endState = new State();
             var byteQueue = new ByteQueue(bytes);
-            var startTick = byteQueue.GetInt32();
-            endState.tick = byteQueue.GetInt32();
+            var startTick = byteQueue.GetInt();
+            endState.tick = byteQueue.GetInt();
             tick = endState.tick;
 
-            var spawnCount = byteQueue.GetInt32();
+            var spawnCount = byteQueue.GetInt();
             for (int i = 0; i < spawnCount; i++)
-                spawns.Add(new Entity(byteQueue.GetInt32()));
+                spawns.Add(new Entity(byteQueue.GetInt()));
 
-            var despawnCount = byteQueue.GetInt32();
+            var despawnCount = byteQueue.GetInt();
             for (int i = 0; i < despawnCount; i++)
-                despawns.Add(startState.entities.Where(entity => entity.id == byteQueue.GetInt32()).First());
+                despawns.Add(startState.entities.Where(entity => entity.id == byteQueue.GetInt()).First());
 
             endState.entities.AddRange(startState.entities.Union(spawns).Except(despawns).OrderBy(entity => entity.id));
 
@@ -53,7 +53,7 @@ namespace EntityComponentState
                 var currentIndex = 0;
                 while (currentIndex < endState.entities.Count)
                 {
-                    var skip = byteQueue.GetInt32();
+                    var skip = byteQueue.GetInt();
                     for (int i = 0; i < skip; i++)
                         changes.Add(new Change { componentType = componentType, entityId = endState.entities[currentIndex + i].id });
                     currentIndex += skip;

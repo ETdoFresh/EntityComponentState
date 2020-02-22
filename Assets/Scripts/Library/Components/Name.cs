@@ -27,9 +27,14 @@
             return name.ToByteHexString();
         }
 
-        public override byte[] ToBytes()
+        public override ByteQueue ToBytes()
         {
-            return name.ToBytes();
+            return new ByteQueue(name);
+        }
+
+        public override void FromBytes(ByteQueue bytes)
+        {
+            name = bytes.GetString();
         }
 
         public override byte[] ToCompressedBytes()
@@ -44,7 +49,7 @@
 
         public override string ToString()
         {
-            return $"Entity ID: {entity.id} [{name}]";
+            return $"[{entity.id}][{name}][{GetType().Name}]";
         }
 
         public override bool Equals(object obj)
