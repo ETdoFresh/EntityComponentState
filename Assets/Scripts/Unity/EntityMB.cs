@@ -11,7 +11,7 @@ namespace EntityComponentState.Unity
         {
             if (entity == null)
             {
-                entity = new Entity();
+                entity = new Entity(IDAssignment.GetID(typeof(Entity).FullName));
                 id = entity.id;
             }
         }

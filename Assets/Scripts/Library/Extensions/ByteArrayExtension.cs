@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EntityComponentState
 {
-    public static class ByteArrayExtension
+    public static partial class ByteArrayExtension
     {
         public static string ToHexString(this byte @byte)
         {
