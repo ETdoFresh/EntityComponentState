@@ -1,10 +1,23 @@
 ﻿using EntityComponentState;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
-[Serializable]
+public abstract class SerializableListBase<T> : List<T>, IToBytes where T : IToBytes
+{
+    public abstract ByteQueue ToBytes();
+    public abstract void FromBytes(ByteQueue bytes);
+}
+
 public class SerializableList<T> : List<T>, IToBytes where T : IToBytes
 {
+    [NonSerialized] public Type type;
+
+    public SerializableList()
+    {
+        type = typeof(T);
+    }
+
     public virtual ByteQueue ToBytes()
     {
         var bytes = new ByteQueue();
@@ -16,13 +29,13 @@ public class SerializableList<T> : List<T>, IToBytes where T : IToBytes
 
     public virtual void FromBytes(ByteQueue bytes)
     {
+        Clear();
         var count = bytes.GetInt();
         for (int i = 0; i < count; i++)
-            Add(bytes.GetIToBytes<T>());
+            Add(bytes.GetIToBytes<T>(type));
     }
 }
 
-[Serializable]
 public class SerializableListByteCount<T> : SerializableList<T> where T : IToBytes
 {
     public override ByteQueue ToBytes()
@@ -38,7 +51,7 @@ public class SerializableListByteCount<T> : SerializableList<T> where T : IToByt
     {
         var count = bytes.GetByte();
         for (int i = 0; i < count; i++)
-            Add(bytes.GetIToBytes<T>());
+            Add(bytes.GetIToBytes<T>(type));
     }
 }
 

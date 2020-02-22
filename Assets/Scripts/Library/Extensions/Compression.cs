@@ -2,7 +2,7 @@
 
 public static class Compression
 {
-    public static float MapToByte(float value, float min, float max)
+    public static byte MapToByte(float value, float min, float max)
     {
         var range = max - min;
         var normalized = (value - min) / range;
@@ -11,11 +11,12 @@ public static class Compression
 
     public static float MapFromByte(byte value, float min, float max)
     {
+        var normalized = value / 256f;
         var range = max - min;
-        return value / range + min;
+        return normalized * range + min;
     }
 
-    public static float MapToUShort(float value, float min, float max)
+    public static ushort MapToUShort(float value, float min, float max)
     {
         var range = max - min;
         var normalized = (value - min) / range;
@@ -24,7 +25,8 @@ public static class Compression
 
     public static float MapFromUShort(ushort value, float min, float max)
     {
+        var normalized = value / 65536f;
         var range = max - min;
-        return value / range + min;
+        return normalized * range + min;
     }
 }

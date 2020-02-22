@@ -2,7 +2,7 @@
 
 namespace EntityComponentState.Unity
 {
-    public class RotationMB : ComponentMB<Rotation>
+    public class CompressedRotationMB : ComponentMB<CompressedRotation>
     {
         public Quaternion value;
 

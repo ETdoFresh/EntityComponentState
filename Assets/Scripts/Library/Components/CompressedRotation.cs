@@ -1,6 +1,6 @@
 ﻿namespace EntityComponentState
 {
-    public class CompressedRotation : Rotation
+    public class CompressedRotation : Vector4Component
     {
         private const float MIN_ROTATION = -1.28f;
         private const float MAX_ROTATION = 1.28f;

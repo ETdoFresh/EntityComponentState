@@ -2,7 +2,7 @@
 
 namespace EntityComponentState.Unity
 {
-    public class PositionMB : ComponentMB<Position>
+    public class CompressedPositionMB : ComponentMB<CompressedPosition>
     {
         public UnityVector3 value;
 

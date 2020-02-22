@@ -1,9 +1,9 @@
 ﻿namespace EntityComponentState
 {
-    public class CompressedScale : Scale
+    public class CompressedScale : Vector3Component
     {
         private const float MIN_POSITION = 0f;
-        private const float MAX_POSITION = 6.4f;
+        private const float MAX_POSITION = 64f;
 
         public override ByteQueue ToBytes()
         {

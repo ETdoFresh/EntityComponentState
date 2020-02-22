@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Demo/Scenes/StateReadFromFile.unity
     guid: 2cc85de2e0fe3a743b0f35b30f710fe9
+  - enabled: 1
+    path: Assets/Demo/Scenes/StateWriteToFile.unity
+    guid: d35edfffe88440f4fb43e1991136753e
   m_configObjects: {}

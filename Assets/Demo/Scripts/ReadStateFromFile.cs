@@ -5,15 +5,17 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
+[RequireComponent(typeof(AState))]
 public class ReadStateFromFile : MonoBehaviour
 {
-    public State state = new State();
+    public AState aState;
     public List<StateClone> clones = new List<StateClone>();
     public ByteQueue byteQueue = new ByteQueue();
     private FileStream file;
 
     private void OnEnable()
     {
+        if (!aState) aState = GetComponent<AState>();
         file = File.Open(WriteStateToFile.FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
     }
 
@@ -29,7 +31,7 @@ public class ReadStateFromFile : MonoBehaviour
             var bytes = new byte[file.Length];
             file.Position = 0;
             file.Read(bytes, 0, (int)file.Length);
-            state.FromBytes(new ByteQueue(bytes));
+            aState.FromBytes(new ByteQueue(bytes));
             SpawnEntities();
             DespawnEntities();
             ApplyChangesToEntites();
@@ -41,7 +43,7 @@ public class ReadStateFromFile : MonoBehaviour
 
     private void SpawnEntities()
     {
-        var spawns = state.entities.Where(entity => !clones.Any(clone => clone.entityId == entity.id));
+        var spawns = aState.state.entities.Where(entity => !clones.Any(clone => clone.entityId == entity.id));
         foreach (var spawn in spawns)
         {
             GameObject newGameObject = null;
@@ -72,7 +74,7 @@ public class ReadStateFromFile : MonoBehaviour
 
     private void DespawnEntities()
     {
-        var despawns = clones.Where(clone => !state.entities.Any(entity => clone.entityId == entity.id));
+        var despawns = clones.Where(clone => !aState.state.entities.Any(entity => clone.entityId == entity.id));
         foreach (var despawn in despawns)
         {
             clones.Remove(despawn);
@@ -82,7 +84,7 @@ public class ReadStateFromFile : MonoBehaviour
 
     private void ApplyChangesToEntites()
     {
-        foreach (var entity in state.entities)
+        foreach (var entity in aState.state.entities)
         {
             var clone = clones.First(c => c.entityId == entity.id);
             foreach (var component in entity.components)

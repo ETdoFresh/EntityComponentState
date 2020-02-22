@@ -2,7 +2,7 @@
 
 namespace EntityComponentState.Unity
 {
-    public class ScaleMB : ComponentMB<Scale>
+    public class CompressedScaleMB : ComponentMB<CompressedScale>
     {
         public UnityVector3 value;
 

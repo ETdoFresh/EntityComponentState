@@ -4,14 +4,12 @@ using System.Linq;
 
 namespace EntityComponentState
 {
-    [Serializable]
     public class Entity : IToBytes
     {
         public static readonly Entity NULL = new Entity(-1);
+        public static bool AS_BYTE = true; //TODO: Fix this smelly code!
 
         public int id = -1;
-        
-        [NonSerialized] 
         public List<Component> components = new List<Component>();
 
         public Entity() { }
@@ -113,14 +111,20 @@ namespace EntityComponentState
             return id;
         }
 
-        public ByteQueue ToBytes()
+        public virtual ByteQueue ToBytes()
         {
-            return new ByteQueue(id);
+            if (AS_BYTE)
+                return new ByteQueue((byte)id);
+            else
+                return new ByteQueue(id);
         }
 
-        public void FromBytes(ByteQueue bytes)
+        public virtual void FromBytes(ByteQueue bytes)
         {
-            id = bytes.GetInt();
+            if (AS_BYTE)
+                id = bytes.GetByte();
+            else
+                id = bytes.GetInt();
         }
     }
 }

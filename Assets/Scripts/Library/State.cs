@@ -4,7 +4,6 @@ using System.Linq;
 
 namespace EntityComponentState
 {
-    [Serializable]
     public class State : IToBytes
     {
         public int tick;
@@ -13,19 +12,22 @@ namespace EntityComponentState
 
         public State()
         {
-            entities = new SerializableList<Entity>();
-            types = new List<Type>
-            {
-                typeof(Position),
-                typeof(Rotation),
-                typeof(Scale),
-                typeof(Velocity),
-                typeof(AngularVelocity),
-                typeof(Sprite),
-                typeof(AnimationFrame),
-                typeof(Primitive),
-                typeof(Name)
-            };
+            if (types == null)
+                types = new List<Type>
+                {
+                    typeof(Position),
+                    typeof(Rotation),
+                    typeof(Scale),
+                    typeof(Velocity),
+                    typeof(AngularVelocity),
+                    typeof(Sprite),
+                    typeof(AnimationFrame),
+                    typeof(Primitive),
+                    typeof(Name)
+                };
+            
+            if (entities == null)
+                entities = new SerializableList<Entity>();
         }
 
         public static State Create(int tick, IEnumerable<Entity> entities)
@@ -95,8 +97,7 @@ namespace EntityComponentState
         public void FromBytes(ByteQueue bytes)
         {
             tick = bytes.GetInt();
-            entities.Clear();
-            entities.AddRange(bytes.GetIToBytess<Entity>());
+            entities.FromBytes(bytes);
 
             foreach (var componentType in types)
             {
@@ -104,7 +105,7 @@ namespace EntityComponentState
                 {
                     var hasComponent = bytes.GetBool();
                     if (hasComponent)
-                        entity.AddComponent(bytes.GetIToBytes<Component>());
+                        entity.AddComponent(bytes.GetIToBytes<Component>(componentType));
                 }
             }
         }
@@ -114,7 +115,6 @@ namespace EntityComponentState
     {
         public CompressedState()
         {
-            entities = new SerializableListByteCount<Entity>();
             types = new List<Type>
             {
                 typeof(CompressedPosition),
@@ -127,6 +127,7 @@ namespace EntityComponentState
                 typeof(Primitive),
                 typeof(Name)
             };
+            entities = new SerializableListByteCount<Entity>();
         }
     }
 }

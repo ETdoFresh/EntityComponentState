@@ -1,6 +1,6 @@
 ﻿namespace EntityComponentState
 {
-    public class CompressedPosition : Position
+    public class CompressedPosition : Vector3Component
     {
         private const float MIN_POSITION = -65.536f;
         private const float MAX_POSITION = 65.536f;

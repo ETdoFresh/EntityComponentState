@@ -1,6 +1,6 @@
 ﻿namespace EntityComponentState
 {
-    public class CompressedVelocity : Velocity
+    public class CompressedVelocity : Vector3Component
     {
         private const float MIN_POSITION = -65.536f;
         private const float MAX_POSITION = 65.536f;

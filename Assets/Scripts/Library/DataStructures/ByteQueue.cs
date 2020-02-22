@@ -92,43 +92,12 @@ namespace EntityComponentState
             return value;
         }
 
-        public T GetIToBytes<T>() where T : IToBytes
+        public T GetIToBytes<T>(Type type) where T : IToBytes
         {
-            var fullName = GetString();
-            var type = typeof(IToBytes).Assembly.GetType(fullName);
             var instance = (T)Activator.CreateInstance(type);
             instance.FromBytes(this);
             return instance;
         }
-
-        public IEnumerable<byte> GetBytes()
-        {
-            var count = GetInt();
-            for (int i = 0; i < count; i++)
-                yield return GetByte();
-        }
-
-        public IEnumerable<bool> GetBools()
-        {
-            var count = GetInt();
-            for (int i = 0; i < count; i++)
-                yield return GetBool();
-        }
-
-        public IEnumerable<short> GetShorts()
-        {
-            var count = GetInt();
-            for (int i = 0; i < count; i++)
-                yield return GetShort();
-        }
-
-        public IEnumerable<T> GetIToBytess<T>() where T : IToBytes
-        {
-            var count = GetInt();
-            for (int i = 0; i < count; i++)
-                yield return GetIToBytes<T>();
-        }
-
 
         public float GetCompressedSingle(float minRange, float maxRange, int bytes)
         {
@@ -167,7 +136,7 @@ namespace EntityComponentState
         public void Enqueue(float value) => AddRange(BitConverter.GetBytes(value));
         public void Enqueue(double value) => AddRange(BitConverter.GetBytes(value));
         public void Enqueue(string value) { AddRange(BitConverter.GetBytes(value.Length)); AddRange(Encoding.UTF8.GetBytes(value)); }
-        public void Enqueue(IToBytes value) { Enqueue(value.GetType().FullName); AddRange(value.ToBytes()); }
+        public void Enqueue(IToBytes value) { AddRange(value.ToBytes()); }
 
         public string ToHexString()
         {

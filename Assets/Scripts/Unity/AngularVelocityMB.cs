@@ -4,36 +4,22 @@ using UnityVector3 = UnityEngine.Vector3;
 namespace EntityComponentState.Unity
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class AngularVelocityMB : ComponentMB
+    public class AngularVelocityMB : ComponentMB<AngularVelocity>
     {
         public UnityVector3 value;
-        public AngularVelocity angularVelocity;
         public new Rigidbody rigidbody;
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
-            entity = GetComponent<EntityMB>().entity;
-            rigidbody = GetComponent<Rigidbody>();
-
-            if (entity.HasComponent<AngularVelocity>())
-                angularVelocity = entity.GetComponent<AngularVelocity>();
-            else if (angularVelocity == null)
-                angularVelocity = new AngularVelocity();
-
-            if (!entity.HasComponent<AngularVelocity>())
-                entity.AddComponent(angularVelocity);
-        }
-
-        private void OnDisable()
-        {
-            entity.RemoveComponent(angularVelocity);
+            base.OnEnable();
+            if (!rigidbody) rigidbody = GetComponent<Rigidbody>();
         }
 
         private void Update()
         {
-            value.x = angularVelocity.X = rigidbody.angularVelocity.x;
-            value.y = angularVelocity.Y = rigidbody.angularVelocity.y;
-            value.z = angularVelocity.Z = rigidbody.angularVelocity.z;
+            value.x = component.X = rigidbody.angularVelocity.x;
+            value.y = component.Y = rigidbody.angularVelocity.y;
+            value.z = component.Z = rigidbody.angularVelocity.z;
         }
     }
 }

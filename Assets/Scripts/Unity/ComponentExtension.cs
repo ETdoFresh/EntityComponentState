@@ -32,36 +32,51 @@ namespace EntityComponentState.Unity
                 gameObject.transform.position = position.value.ToUnityVector3();
                 return;
             }
-            if (component is Rotation rotation)
+            else if (component is Rotation rotation)
             {
                 gameObject.transform.rotation = rotation.value.ToUnityQuaternion();
                 return;
             }
-            if (component is Scale scale)
+            else if (component is Scale scale)
             {
                 gameObject.transform.localScale = scale.value.ToUnityVector3();
                 return;
             }
-            if (component is Velocity velocity)
+            else if (component is CompressedPosition compressedPosition)
+            {
+                gameObject.transform.position = compressedPosition.value.ToUnityVector3();
+                return;
+            }
+            else if (component is CompressedRotation compressedRotation)
+            {
+                gameObject.transform.rotation = compressedRotation.value.ToUnityQuaternion();
+                return;
+            }
+            else if (component is CompressedScale compressedScale)
+            {
+                gameObject.transform.localScale = compressedScale.value.ToUnityVector3();
+                return;
+            }
+            else if (component is Velocity velocity)
             {
                 var rigidbody = gameObject.GetComponent<Rigidbody>();
                 if (!rigidbody) return;
                 rigidbody.velocity = velocity.value.ToUnityVector3();
                 return;
             }
-            if (component is AngularVelocity angularVelocity)
+            else if (component is AngularVelocity angularVelocity)
             {
                 var rigidbody = gameObject.GetComponent<Rigidbody>();
                 if (!rigidbody) return;
                 rigidbody.angularVelocity = angularVelocity.value.ToUnityVector3();
                 return;
             }
-            if (component is Name name)
+            else if (component is Name name)
             {
                 gameObject.name = name.name;
                 return;
             }
-            if (component is Primitive primitive)
+            else if (component is Primitive primitive)
             {
                 var meshFilter = gameObject.GetComponent<MeshFilter>();
                 if (!meshFilter) return;
