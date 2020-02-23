@@ -13,14 +13,14 @@ namespace EntityComponentState
             return this.Where(state => state.tick == tick).FirstOrDefault();
         }
 
-        public DeltaState GetDeltaState(int startTick, int endTick)
+        public DeltaStateOld GetDeltaState(int startTick, int endTick)
         {
             var startState = GetState(startTick);
             var endState = GetState(endTick);
-            return new DeltaState(startState, endState);
+            return new DeltaStateOld(startState, endState);
         }
 
-        public DeltaState GetDeltaState(int startTick)
+        public DeltaStateOld GetDeltaState(int startTick)
         {
             return GetDeltaState(startTick, LatestTick);
         }

@@ -9,7 +9,7 @@ namespace EntityComponentState.Unity
         public StateMB stateMB;
         public List<StateClone> clones = new List<StateClone>();
 
-        public DeltaState DeltaState => stateMB != null ? stateMB.deltaState : null;
+        public DeltaStateOld DeltaState => stateMB != null ? stateMB.deltaState : null;
 
         private void Update()
         {

@@ -6,7 +6,7 @@ namespace EntityComponentState.Unity
     public class StateMB : MonoBehaviour
     {
         public State state;
-        public DeltaState deltaState;
+        public DeltaStateOld deltaState;
         public int tick;
         [TextArea(1, 20)] public string stateString;
         [TextArea(1, 20)] public string stateBytes;
@@ -23,7 +23,7 @@ namespace EntityComponentState.Unity
         {
             var startState = state != null ? state : new State();
             GetState();
-            deltaState = new DeltaState(startState, state);
+            deltaState = new DeltaStateOld(startState, state);
 
             // Create lots of garbage for GC
             deltaStateString = deltaState.ToString();
