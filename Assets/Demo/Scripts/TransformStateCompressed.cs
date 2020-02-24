@@ -1,6 +1,7 @@
 ﻿using EntityComponentState;
 using EntityComponentState.Unity;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -16,28 +17,26 @@ public class TransformStateCompressed : AState
 
     private void Update()
     {
+        state.tick++;
         state.entities.Clear();
         state.entities.AddRange(FindObjectsOfType<EntityMB>().Select(e => e.entity));
-        Entity.AS_BYTE = true;
         stateString = state.ToString();
         stateBytes = $"{state.ToBytes().ToHexString()} [{state.ToBytes().Count}]";
     }
 
     public override ByteQueue ToBytes()
     {
-        Entity.AS_BYTE = true;
         return state.ToBytes();
     }
 
     public override void FromBytes(ByteQueue bytes)
     {
-        Entity.AS_BYTE = true;
         state.FromBytes(bytes);
         stateString = state.ToString();
         stateBytes = $"{state.ToBytes().ToHexString()} [{state.ToBytes().Count}]";
     }
 
-    public class TransformState : State
+    public class TransformState : CompressedState
     {
         public static Type[] TYPES = new[]
         {
@@ -47,11 +46,6 @@ public class TransformStateCompressed : AState
             typeof(Name),
             typeof(Primitive)
         };
-
-        public TransformState()
-        {
-            entities = new SerializableListByteCount<Entity>();
-            types = TYPES;
-        }
+        public override IEnumerable<Type> types { get; protected set; } = TYPES;
     }
 }

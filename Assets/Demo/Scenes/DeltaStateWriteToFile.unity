@@ -498,9 +498,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 915070703}
-  - component: {fileID: 915070704}
-  - component: {fileID: 915070706}
   - component: {fileID: 915070705}
+  - component: {fileID: 915070704}
+  - component: {fileID: 915070702}
   m_Layer: 0
   m_Name: State
   m_TagString: Untagged
@@ -508,6 +508,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &915070702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 915070701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a405313c7e98644282777f15e4956b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aState: {fileID: 915070705}
 --- !u!4 &915070703
 Transform:
   m_ObjectHideFlags: 0
@@ -545,20 +558,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 623385975b8ea3a4a92dfd02031f7677, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stateString: 
-  stateBytes: 
---- !u!114 &915070706
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 915070701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 39c766f01a910ba4598331282686c8a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   stateString: 

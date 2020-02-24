@@ -1,7 +1,6 @@
 ﻿using EntityComponentState;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 public abstract class SerializableListBase<T> : List<T>, IToBytes where T : IToBytes
 {
@@ -13,10 +12,10 @@ public class SerializableList<T> : List<T>, IToBytes where T : IToBytes
 {
     [NonSerialized] public Type type;
 
-    public SerializableList()
-    {
-        type = typeof(T);
-    }
+    public SerializableList() { type = typeof(T); }
+    public SerializableList(IEnumerable<T> collection) : base(collection) { type = typeof(T); }
+
+    public virtual SerializableList<T> Clone() => new SerializableList<T>(this);
 
     public virtual ByteQueue ToBytes()
     {
@@ -38,6 +37,11 @@ public class SerializableList<T> : List<T>, IToBytes where T : IToBytes
 
 public class SerializableListByteCount<T> : SerializableList<T> where T : IToBytes
 {
+    public SerializableListByteCount() { type = typeof(T); }
+    public SerializableListByteCount(IEnumerable<T> collection) : base(collection) { }
+
+    public override SerializableList<T> Clone() => new SerializableListByteCount<T>(this);
+
     public override ByteQueue ToBytes()
     {
         var bytes = new ByteQueue();
@@ -55,8 +59,11 @@ public class SerializableListByteCount<T> : SerializableList<T> where T : IToByt
     }
 }
 
-public class SerializableListByte: List<byte>, IToBytes
+public class SerializableListByte : List<byte>, IToBytes
 {
+    public SerializableListByte() : base() { }
+    public SerializableListByte(IEnumerable<byte> collection) : base(collection) { }
+
     public ByteQueue ToBytes()
     {
         var bytes = new ByteQueue();
@@ -76,6 +83,9 @@ public class SerializableListByte: List<byte>, IToBytes
 
 public class SerializableListBool : List<bool>, IToBytes
 {
+    public SerializableListBool() : base() { }
+    public SerializableListBool(IEnumerable<bool> collection) : base(collection) { }
+
     public ByteQueue ToBytes()
     {
         var bytes = new ByteQueue();
@@ -95,6 +105,9 @@ public class SerializableListBool : List<bool>, IToBytes
 
 public class SerializableListShort : List<short>, IToBytes
 {
+    public SerializableListShort() : base() { }
+    public SerializableListShort(IEnumerable<short> collection) : base(collection) { }
+
     public ByteQueue ToBytes()
     {
         var bytes = new ByteQueue();
@@ -114,6 +127,9 @@ public class SerializableListShort : List<short>, IToBytes
 
 public class SerializableListUShort : List<ushort>, IToBytes
 {
+    public SerializableListUShort() : base() { }
+    public SerializableListUShort(IEnumerable<ushort> collection) : base(collection) { }
+
     public ByteQueue ToBytes()
     {
         var bytes = new ByteQueue();
@@ -133,6 +149,9 @@ public class SerializableListUShort : List<ushort>, IToBytes
 
 public class SerializableListInt : List<int>, IToBytes
 {
+    public SerializableListInt() : base() { }
+    public SerializableListInt(IEnumerable<int> collection) : base(collection) { }
+
     public ByteQueue ToBytes()
     {
         var bytes = new ByteQueue();
@@ -152,6 +171,9 @@ public class SerializableListInt : List<int>, IToBytes
 
 public class SerializableListUInt : List<uint>, IToBytes
 {
+    public SerializableListUInt() : base() { }
+    public SerializableListUInt(IEnumerable<uint> collection) : base(collection) { }
+
     public ByteQueue ToBytes()
     {
         var bytes = new ByteQueue();
@@ -171,6 +193,9 @@ public class SerializableListUInt : List<uint>, IToBytes
 
 public class SerializableListFloat : List<float>, IToBytes
 {
+    public SerializableListFloat() : base() { }
+    public SerializableListFloat(IEnumerable<float> collection) : base(collection) { }
+
     public ByteQueue ToBytes()
     {
         var bytes = new ByteQueue();
@@ -190,6 +215,9 @@ public class SerializableListFloat : List<float>, IToBytes
 
 public class SerializableListDouble : List<double>, IToBytes
 {
+    public SerializableListDouble() : base() { }
+    public SerializableListDouble(IEnumerable<double> collection) : base(collection) { }
+
     public ByteQueue ToBytes()
     {
         var bytes = new ByteQueue();
@@ -209,6 +237,9 @@ public class SerializableListDouble : List<double>, IToBytes
 
 public class SerializableListString : List<string>, IToBytes
 {
+    public SerializableListString() : base() { }
+    public SerializableListString(IEnumerable<string> collection) : base(collection) { }
+
     public ByteQueue ToBytes()
     {
         var bytes = new ByteQueue();
@@ -223,5 +254,53 @@ public class SerializableListString : List<string>, IToBytes
         var count = bytes.GetInt();
         for (int i = 0; i < count; i++)
             Add(bytes.GetString());
+    }
+}
+
+public class SerializableListEntity : List<Entity>, IToBytes
+{
+    public SerializableListEntity() : base() { }
+    public SerializableListEntity(IEnumerable<Entity> collection) : base(collection) { }
+
+    public virtual SerializableListEntity Clone() => new SerializableListEntity(this);
+
+    public virtual ByteQueue ToBytes()
+    {
+        var bytes = new ByteQueue();
+        bytes.Enqueue(Count);
+        for (int i = 0; i < Count; i++)
+            bytes.Enqueue(this[i].id);
+        return bytes;
+    }
+
+    public virtual void FromBytes(ByteQueue bytes)
+    {
+        var count = bytes.GetInt();
+        for (int i = 0; i < count; i++)
+            Add(new Entity(bytes.GetInt()));
+    }
+}
+
+public class SerializableListEntityCompressed : SerializableListEntity
+{
+    public SerializableListEntityCompressed() : base() { }
+    public SerializableListEntityCompressed(IEnumerable<Entity> collection) : base(collection) { }
+
+    public override SerializableListEntity Clone() => new SerializableListEntityCompressed(this);
+
+    public override ByteQueue ToBytes()
+    {
+        var bytes = new ByteQueue();
+        bytes.Enqueue((byte)Count);
+        for (int i = 0; i < Count; i++)
+            bytes.Enqueue((byte)this[i].id);
+        return bytes;
+    }
+
+    public override void FromBytes(ByteQueue bytes)
+    {
+        var count = bytes.GetByte();
+        for (int i = 0; i < count; i++)
+            Add(new Entity(bytes.GetByte()));
     }
 }

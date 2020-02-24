@@ -1,65 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace EntityComponentState
 {
-    public class State : IToBytes
+    public abstract class State : IToBytes
     {
         public int tick;
-        public SerializableList<Entity> entities;
-        [NonSerialized] public IEnumerable<Type> types;
+        
+        public virtual SerializableListEntity entities { get; protected set; } = new SerializableListEntity();
+        public abstract IEnumerable<Type> types { get; protected set; }
 
-        public State()
+        public virtual State Clone()
         {
-            if (types == null)
-                types = new List<Type>
-                {
-                    typeof(Position),
-                    typeof(Rotation),
-                    typeof(Scale),
-                    typeof(Velocity),
-                    typeof(AngularVelocity),
-                    typeof(Sprite),
-                    typeof(AnimationFrame),
-                    typeof(Primitive),
-                    typeof(Name)
-                };
-            
-            if (entities == null)
-                entities = new SerializableList<Entity>();
-        }
-
-        public static State Create(int tick, IEnumerable<Entity> entities)
-        {
-            var newState = new State
-            {
-                tick = tick
-            };
-            foreach (var entity in entities.OrderBy(e => e.id))
-                newState.entities.Add(entity.Clone());
-            return newState;
-        }
-
-        public State Clone()
-        {
-            return Create(tick, entities);
-        }
-
-        private int GetCount(Type type)
-        {
-            var count = 0;
-            foreach (var entity in entities)
-                if (entity.HasComponent(type))
-                    count++;
-            return count;
-        }
-
-        private IEnumerable<Component> GetComponents(Type type)
-        {
-            foreach (var entity in entities)
-                if (entity.HasComponent(type))
-                    yield return entity.GetComponent(type);
+            var state = (State)Activator.CreateInstance(GetType());
+            state.tick = tick;
+            state.entities = entities.Clone();
+            state.types = types;
+            return state;
         }
 
         public override string ToString()
@@ -67,11 +24,11 @@ namespace EntityComponentState
             var output = $"State [Tick: {tick}]\r\n";
             foreach (var componentType in types)
             {
-                output += $"  {componentType.Name} [Count: {GetCount(componentType)}]\r\n";
-                foreach (var component in GetComponents(componentType))
-                    output += $"    {component}\r\n";
+                output += $"  {componentType.Name}\r\n";
+                foreach (var entity in entities)
+                    if (entity.HasComponent(componentType))
+                        output += $"    {entity.GetComponent(componentType)}\r\n";
             }
-
             return output;
         }
 
@@ -111,23 +68,8 @@ namespace EntityComponentState
         }
     }
 
-    public class CompressedState : State
+    public abstract class CompressedState : State
     {
-        public CompressedState()
-        {
-            types = new List<Type>
-            {
-                typeof(CompressedPosition),
-                typeof(CompressedRotation),
-                typeof(CompressedScale),
-                typeof(CompressedVelocity),
-                typeof(CompressedAngularVelocity),
-                typeof(Sprite),
-                typeof(AnimationFrame),
-                typeof(Primitive),
-                typeof(Name)
-            };
-            entities = new SerializableListByteCount<Entity>();
-        }
+        public override SerializableListEntity entities { get; protected set; } = new SerializableListEntityCompressed();
     }
 }

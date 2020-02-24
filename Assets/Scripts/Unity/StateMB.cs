@@ -21,7 +21,7 @@ namespace EntityComponentState.Unity
 
         public void GetDeltaState()
         {
-            var startState = state != null ? state : new State();
+            var startState = state != null ? state : new TransformStateCompressed.TransformState();
             GetState();
             deltaState = new DeltaStateOld(startState, state);
 
@@ -32,7 +32,7 @@ namespace EntityComponentState.Unity
 
         public void GetState()
         {
-            state = new State { tick = tick };
+            state = new TransformStateCompressed.TransformState { tick = tick };
             state.entities.AddRange(FindObjectsOfType<EntityMB>().Select(e => e.entity.Clone()).OrderBy(e => e.id));
 
             // Create lots of garbage for GC

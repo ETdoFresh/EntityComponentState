@@ -45,7 +45,7 @@ namespace EntityComponentState
         public DeltaStateOld(byte[] bytes, State startState)
         {
             this.startState = startState;
-            this.endState = new State();
+            this.endState = new TransformStateCompressed.TransformState();
             var byteQueue = new ByteQueue(bytes);
             var startTick = byteQueue.GetInt();
             endState.tick = byteQueue.GetInt();
@@ -84,7 +84,7 @@ namespace EntityComponentState
 
         public State GenerateEndState()
         {
-            var endState = new State
+            var endState = new TransformStateCompressed.TransformState
             {
                 tick = tick
             };

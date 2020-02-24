@@ -4,10 +4,9 @@ using System.Linq;
 
 namespace EntityComponentState
 {
-    public class Entity : IToBytes
+    public class Entity
     {
         public static readonly Entity NULL = new Entity(-1);
-        public static bool AS_BYTE = true; //TODO: Fix this smelly code!
 
         public int id = -1;
         public List<Component> components = new List<Component>();
@@ -109,22 +108,6 @@ namespace EntityComponentState
         public override int GetHashCode()
         {
             return id;
-        }
-
-        public virtual ByteQueue ToBytes()
-        {
-            if (AS_BYTE)
-                return new ByteQueue((byte)id);
-            else
-                return new ByteQueue(id);
-        }
-
-        public virtual void FromBytes(ByteQueue bytes)
-        {
-            if (AS_BYTE)
-                id = bytes.GetByte();
-            else
-                id = bytes.GetInt();
         }
     }
 }
