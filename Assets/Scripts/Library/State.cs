@@ -11,6 +11,12 @@ namespace EntityComponentState
         public virtual SerializableListEntity entities { get; protected set; } = new SerializableListEntity();
         public abstract IEnumerable<Type> types { get; protected set; }
 
+        public virtual void Clear()
+        {
+            tick = 0;
+            entities.Clear();
+        }
+
         public virtual State Clone()
         {
             var state = (State)Activator.CreateInstance(GetType());

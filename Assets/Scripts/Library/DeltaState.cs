@@ -56,10 +56,8 @@ namespace EntityComponentState
 
         public void Clear()
         {
-            startState.tick = 0;
-            endState.tick = 0;
-            startState.entities.Clear();
-            endState.entities.Clear();
+            startState.Clear();
+            endState.Clear();
             spawns.Clear();
             despawns.Clear();
             changes.Clear();
@@ -135,16 +133,20 @@ namespace EntityComponentState
 
         public void FromBytes(ByteQueue bytes, State storedStartState)
         {
+            startState.Clear();
+            endState.Clear();
+            changes.Clear();
+
             startState.tick = bytes.GetInt();
             endState.tick = bytes.GetInt();
             spawns = bytes.GetIToBytes<SerializableListEntity>(spawns.GetType());
             despawns = bytes.GetIToBytes<SerializableListEntity>(despawns.GetType());
 
             if (storedStartState == null)
-                throw new ArgumentException("If not start state passed, delta state cannot reconstruct end state");
+                return; //throw new ArgumentException("If not start state passed, delta state cannot reconstruct end state");
 
             if (storedStartState.tick != startState.tick)
-                throw new ArgumentException($"Cannot build tick {endState.tick} from tick {storedStartState.tick}. Expecting tick {startState.tick}.");
+                return; //throw new ArgumentException($"Cannot build tick {endState.tick} from tick {storedStartState.tick}. Expecting tick {startState.tick}.");
 
             startState.entities.AddRange(storedStartState.entities.Clone());
             endState.entities.AddRange(storedStartState.entities.Union(spawns).Except(despawns));

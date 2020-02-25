@@ -10,13 +10,10 @@ using UnityEngine;
 public class ReadDeltaStateFromFile : MonoBehaviour
 {
     public AState stateMB;
-    public DeltaState deltaStateMB;
     public List<StateClone> clones = new List<StateClone>();
-    public ByteQueue byteQueue = new ByteQueue();
     private FileStream stateFile;
     private FileStream deltaStateFile;
     public TransformStateCompressed.TransformDeltaState deltaState = new TransformStateCompressed.TransformDeltaState();
-    private State empty = new TransformStateCompressed.TransformState();
 
     private void OnEnable()
     {
@@ -33,35 +30,42 @@ public class ReadDeltaStateFromFile : MonoBehaviour
 
     private void Update()
     {
-        try
-        {
-            if (stateMB.state == empty) throw new Exception("Empty State");
+        //try
+        //{
+        var startState = stateMB.state;
+        var bytes = new byte[deltaStateFile.Length];
+        deltaStateFile.Position = 0;
+        deltaStateFile.Read(bytes, 0, (int)deltaStateFile.Length);
+        deltaState.FromBytes(new ByteQueue(bytes), startState);
+        ((TransformStateCompressed)stateMB).deltaStateString = deltaState.ToString();
+        ((TransformStateCompressed)stateMB).deltaStateBytes = $"{deltaState.ToBytes().ToHexString()} [{deltaState.ToString()}]";
 
-            var bytes = new byte[deltaStateFile.Length];
-            deltaStateFile.Position = 0;
-            deltaStateFile.Read(bytes, 0, (int)deltaStateFile.Length);
-            deltaState.FromBytes(new ByteQueue(bytes), stateMB.state);
-        }
-        catch // if cannot read or previousState not yet set
+        if (deltaState.startState.tick == startState.tick)
         {
-            deltaState.Clear();
-            var bytes = new byte[stateFile.Length];
+            SpawnEntities(deltaState.endState);
+            DespawnEntities(deltaState.endState);
+            ApplyChangesToEntites(deltaState.endState);
+        }
+        else if (deltaState.startState.tick > startState.tick)
+        {
+            bytes = new byte[stateFile.Length];
             stateFile.Position = 0;
             stateFile.Read(bytes, 0, (int)stateFile.Length);
             stateMB.FromBytes(new ByteQueue(bytes));
+            SpawnEntities(stateMB.state);
+            DespawnEntities(stateMB.state);
+            ApplyChangesToEntites(stateMB.state);
         }
-        finally
-        {
-            SpawnEntities();
-            DespawnEntities();
-            ApplyChangesToEntites();
-
-        }
+        else // deltaState.startState.tick < startState.tick
+        { }
+        //}
+        //catch
+        //{
+        //}
     }
 
-    private void SpawnEntities()
+    private void SpawnEntities(State state)
     {
-        var state = deltaState != null && deltaState.endState != empty ? deltaState.endState : stateMB.state;
         var spawns = state.entities.Where(entity => !clones.Any(clone => clone.entityId == entity.id));
         foreach (var spawn in spawns)
         {
@@ -91,18 +95,16 @@ public class ReadDeltaStateFromFile : MonoBehaviour
         }
     }
 
-    private void DespawnEntities()
+    private void DespawnEntities(State state)
     {
-        var state = deltaState != null && deltaState.endState != empty ? deltaState.endState : stateMB.state;
-        var a = state.entities.Any(e => e.id == 1);
         var despawns = clones.Where(clone => !state.entities.Any(entity => entity.id == clone.entityId));
         foreach (var despawn in despawns)
             Destroy(despawn.gameObject);
     }
 
-    private void ApplyChangesToEntites()
+    private void ApplyChangesToEntites(State state)
     {
-        foreach (var entity in stateMB.state.entities)
+        foreach (var entity in state.entities)
         {
             var clone = clones.First(c => c.entityId == entity.id);
             foreach (var component in entity.components)

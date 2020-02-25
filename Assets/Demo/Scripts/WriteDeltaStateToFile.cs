@@ -31,9 +31,8 @@ public class WriteDeltaStateToFile : MonoBehaviour
         {
             if (previousState != null)
             {
-                var deltaState = new TransformStateCompressed.TransformDeltaState(previousState, state);
                 deltaStateFile.Position = 0;
-                deltaStateFile.Write(deltaState.ToBytes().ToArray(), 0, deltaState.ToBytes().Count);
+                deltaStateFile.Write(aState.deltaState.ToBytes().ToArray(), 0, aState.deltaState.ToBytes().Count);
             }
         }
         catch
