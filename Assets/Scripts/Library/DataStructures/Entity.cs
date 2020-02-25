@@ -80,15 +80,8 @@ namespace EntityComponentState
                 return false;
 
             if (obj is Entity other)
-            {
-                if (this.id != other.id) return false;
-                foreach (var component in components)
-                    if (!other.HasComponent(component.GetType()))
-                        return false;
-                    else if (other.GetComponent(component.GetType()) != component)
-                        return false;
-                return true;
-            }
+                return this.id == other.id;
+
             return false;
         }
 

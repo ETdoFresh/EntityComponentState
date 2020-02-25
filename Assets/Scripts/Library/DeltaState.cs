@@ -4,49 +4,88 @@ using System.Linq;
 
 namespace EntityComponentState
 {
-    public class DeltaState : IToBytes
+    public abstract class DeltaState : IToBytes
     {
-        public State startState;
-        public State endState;
-        public IEnumerable<Entity> spawns;
-        public IEnumerable<Entity> despawns;
-        private IEnumerable<Change> changes;
+        public virtual State startState { get; protected set; }
+        public virtual State endState { get; protected set; }
+        public virtual SerializableListEntity spawns { get; protected set; } = new SerializableListEntity();
+        public virtual SerializableListEntity despawns { get; protected set; } = new SerializableListEntity();
+        private List<Change> changes = new List<Change>();
+
+        public DeltaState() { }
 
         public DeltaState(State startState, State endState)
         {
-            this.startState = startState;
-            this.endState = endState;
+            Create(startState, endState);
+        }
+
+        public void Create(State startState, State endState)
+        {
+            Clear();
+            this.startState.tick = startState.tick;
+            this.endState.tick = endState.tick;
+            this.startState.entities.AddRange(startState.entities);
+            this.endState.entities.AddRange(endState.entities);
             var startEntities = startState.entities;
             var endEntities = endState.entities;
 
-            spawns = endEntities.Where(endEntity => !startEntities.Any(startEntity => startEntity.id == endEntity.id));
-            despawns = startEntities.Where(startEntity => !endEntities.Any(endEntity => startEntity.id == endEntity.id));
-            changes = new Change[0]; // TODO: Impement
+            spawns.AddRange(endEntities.Where(endEntity => !startEntities.Any(startEntity => startEntity.id == endEntity.id)));
+            despawns.AddRange(startEntities.Where(startEntity => !endEntities.Any(endEntity => startEntity.id == endEntity.id)));
+
+            foreach (var endEntity in endState.entities)
+                foreach (var componentType in endState.types)
+                {
+                    var change = new Change { componentType = componentType, entityId = endEntity.id, delta = null };
+                    changes.Add(change);
+
+                    var endComponent = endEntity.GetComponent(componentType);
+                    if (endComponent != null)
+                    {
+                        var startEntity = startState.entities.Where(entity => entity.id == endEntity.id).FirstOrDefault();
+                        if (startEntity == null)
+                            change.delta = endComponent;
+                        else
+                        {
+                            var startComponent = startEntity.GetComponent(componentType);
+                            if (startComponent != endComponent)
+                                change.delta = endComponent;
+                        }
+                    }
+                }
+        }
+
+        public void Clear()
+        {
+            startState.entities.Clear();
+            endState.entities.Clear();
+            spawns.Clear();
+            despawns.Clear();
+            changes.Clear();
         }
 
         public override string ToString()
         {
             var output = $"State [Start Tick: {startState.tick} End Tick: {endState.tick}]\r\n";
 
-            //output += $"\r\nSpawns [Count: {spawns.Count()}]\r\n";
-            //foreach (var entity in spawns)
-            //    output += $"{entity.id} ";
+            output += $"\r\nSpawns [Count: {spawns.Count()}]\r\n";
+            foreach (var entity in spawns)
+                output += $"{entity.id} ";
 
-            //output += $"\r\nDespawns [Count: {despawns.Count()}]\r\n";
-            //foreach (var entity in despawns)
-            //    output += $"{entity.id} ";
+            output += $"\r\nDespawns [Count: {despawns.Count()}]\r\n";
+            foreach (var entity in despawns)
+                output += $"{entity.id} ";
 
             output += "\r\n";
 
             foreach (var componentType in endState.types)
             {
-                //var componentChanges = changes.Where(change => change.componentType == componentType);
-                //output += $"  {componentType.Name} [Count: {componentChanges.Count()}]\r\n";
-                //foreach (var component in componentChanges.Select(change => change.delta))
-                //    if (component is null)
-                //        output += $"    SKIP\r\n";
-                //    else
-                //        output += $"    {component}\r\n";
+                var componentChanges = changes.Where(change => change.componentType == componentType);
+                output += $"  {componentType.Name} [Count: {componentChanges.Count()}]\r\n";
+                foreach (var component in componentChanges.Select(change => change.delta))
+                    if (component is null)
+                        output += $"    SKIP\r\n";
+                    else
+                        output += $"    {component}\r\n";
             }
 
             return output;
@@ -57,18 +96,11 @@ namespace EntityComponentState
             var bytes = new ByteQueue();
             bytes.Enqueue(startState.tick);
             bytes.Enqueue(endState.tick);
-
-            bytes.Enqueue(spawns.Count());
-            foreach (var entity in spawns)
-                bytes.Enqueue(entity.id);
-
-            bytes.Enqueue(despawns.Count());
-            foreach (var entity in despawns)
-                bytes.Enqueue(entity.id);
-
+            bytes.Enqueue(spawns);
+            bytes.Enqueue(despawns);
             foreach (var componentType in endState.types)
             {
-                var componentChanges = changes.Where(change => change.componentType == componentType);
+                var componentChanges = changes.Where(change => change.componentType == componentType).OrderBy(change => change.entityId);
 
                 var i = 0;
                 var skip = 0;
@@ -96,7 +128,44 @@ namespace EntityComponentState
 
         public void FromBytes(ByteQueue bytes)
         {
+            FromBytes(bytes, null);
+        }
 
+        public void FromBytes(ByteQueue bytes, State storedStartState)
+        {
+            startState.tick = bytes.GetInt();
+            endState.tick = bytes.GetInt();
+            spawns = bytes.GetIToBytes<SerializableListEntity>(spawns.GetType());
+            despawns = bytes.GetIToBytes<SerializableListEntity>(despawns.GetType());
+
+            if (storedStartState == null)
+                throw new ArgumentException("If not start state passed, delta state cannot reconstruct end state");
+
+            startState.entities.AddRange(storedStartState.entities.Clone());
+            endState.entities.AddRange(storedStartState.entities.Union(spawns).Except(despawns));
+
+            foreach (var entity in endState.entities)
+                foreach (var componentType in endState.types)
+                    changes.Add(new Change { componentType = componentType, entityId = entity.id });
+
+            foreach (var componentType in endState.types)
+            {
+                var componentChanges = changes.Where(change => change.componentType == componentType);
+
+                var i = 0;
+                while (i < componentChanges.Count())
+                {
+                    var skip = bytes.GetInt();
+                    if (i + skip >= componentChanges.Count())
+                        break;
+
+                    i += skip;
+                    var componentChange = componentChanges.ElementAt(i);
+                    componentChange.delta = bytes.GetIToBytes<Component>(componentType);
+                    var entity = endState.entities.Where(endEntity => endEntity.id == componentChange.entityId).First();
+                    entity.AddComponent(componentChange.delta);
+                }
+            }
         }
 
         private class Change

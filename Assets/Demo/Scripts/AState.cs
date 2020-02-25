@@ -7,6 +7,7 @@ using UnityEngine;
 public abstract class AState : MonoBehaviour
 {
     public State state;
+    public DeltaState deltaState;
     public abstract ByteQueue ToBytes();
     public abstract void FromBytes(ByteQueue bytes);
 }

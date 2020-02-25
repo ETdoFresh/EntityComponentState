@@ -1,6 +1,7 @@
 ﻿using EntityComponentState;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public abstract class SerializableListBase<T> : List<T>, IToBytes where T : IToBytes
 {
@@ -262,7 +263,7 @@ public class SerializableListEntity : List<Entity>, IToBytes
     public SerializableListEntity() : base() { }
     public SerializableListEntity(IEnumerable<Entity> collection) : base(collection) { }
 
-    public virtual SerializableListEntity Clone() => new SerializableListEntity(this);
+    public virtual SerializableListEntity Clone() => new SerializableListEntity(this.Select(e => e.Clone()));
 
     public virtual ByteQueue ToBytes()
     {
@@ -286,7 +287,7 @@ public class SerializableListEntityCompressed : SerializableListEntity
     public SerializableListEntityCompressed() : base() { }
     public SerializableListEntityCompressed(IEnumerable<Entity> collection) : base(collection) { }
 
-    public override SerializableListEntity Clone() => new SerializableListEntityCompressed(this);
+    public override SerializableListEntity Clone() => new SerializableListEntityCompressed(this.Select(e => e.Clone()));
 
     public override ByteQueue ToBytes()
     {
