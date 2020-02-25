@@ -1,5 +1,6 @@
 ﻿using EntityComponentState;
 using EntityComponentState.Unity;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,7 @@ public class ReadDeltaStateFromFile : MonoBehaviour
     private FileStream stateFile;
     private FileStream deltaStateFile;
     public TransformStateCompressed.TransformDeltaState deltaState = new TransformStateCompressed.TransformDeltaState();
+    private State empty = new TransformStateCompressed.TransformState();
 
     private void OnEnable()
     {
@@ -26,15 +28,18 @@ public class ReadDeltaStateFromFile : MonoBehaviour
     private void OnDisable()
     {
         stateFile.Close();
+        deltaStateFile.Close();
     }
 
     private void Update()
     {
         try
         {
-            var bytes = new byte[stateFile.Length];
-            stateFile.Position = 0;
-            stateFile.Read(bytes, 0, (int)stateFile.Length);
+            if (stateMB.state == empty) throw new Exception("Empty State");
+
+            var bytes = new byte[deltaStateFile.Length];
+            deltaStateFile.Position = 0;
+            deltaStateFile.Read(bytes, 0, (int)deltaStateFile.Length);
             deltaState.FromBytes(new ByteQueue(bytes), stateMB.state);
         }
         catch // if cannot read or previousState not yet set
@@ -55,7 +60,7 @@ public class ReadDeltaStateFromFile : MonoBehaviour
 
     private void SpawnEntities()
     {
-        var state = deltaState != null ? deltaState.endState : stateMB.state;
+        var state = deltaState != null && deltaState.endState != empty ? deltaState.endState : stateMB.state;
         var spawns = state.entities.Where(entity => !clones.Any(clone => clone.entityId == entity.id));
         foreach (var spawn in spawns)
         {
@@ -87,7 +92,7 @@ public class ReadDeltaStateFromFile : MonoBehaviour
 
     private void DespawnEntities()
     {
-        var state = deltaState != null ? deltaState.endState : stateMB.state;
+        var state = deltaState != null && deltaState.endState != empty ? deltaState.endState : stateMB.state;
         var despawns = clones.Where(clone => !state.entities.Any(entity => clone.entityId == entity.id));
         foreach (var despawn in despawns)
         {

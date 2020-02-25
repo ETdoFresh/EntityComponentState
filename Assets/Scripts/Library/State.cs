@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace EntityComponentState
 {
     public abstract class State : IToBytes
     {
         public int tick;
-        
+
         public virtual SerializableListEntity entities { get; protected set; } = new SerializableListEntity();
         public abstract IEnumerable<Type> types { get; protected set; }
 
@@ -65,6 +66,45 @@ namespace EntityComponentState
                         entity.AddComponent(bytes.GetIToBytes<Component>(componentType));
                 }
             }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is State other)
+            {
+                if (tick != other.tick) return false;
+                if (entities.Count != other.entities.Count) return false;
+
+                foreach (var entity in entities)
+                    if (!other.entities.Contains(entity))
+                        return false;
+
+                foreach (var entity in entities)
+                    foreach (var component in entity.components)
+                        if (!other.entities.First(e => e == entity).components.Contains(component))
+                            return false;
+
+                return true;
+            }
+            return false;
+        }
+
+        public static bool operator ==(State lhs, State rhs)
+        {
+            if (lhs is null)
+                return rhs is null;
+            else
+                return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(State lhs, State rhs)
+        {
+            return !(lhs == rhs);
+        }
+
+        public override int GetHashCode()
+        {
+            return tick.GetHashCode();
         }
     }
 

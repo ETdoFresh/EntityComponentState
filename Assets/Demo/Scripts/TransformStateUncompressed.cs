@@ -7,13 +7,11 @@ using UnityEngine;
 
 public class TransformStateUncompressed : AState
 {
+    public override State state { get; protected set; } = new TransformState();
+    //public override DeltaState deltaState { get; protected set; } = new TransformDeltaState();
+
     [TextArea(2, 20)] public string stateString;
     [TextArea(2, 20)] public string stateBytes;
-
-    private void OnEnable()
-    {
-        state = new TransformState();
-    }
 
     private void Update()
     {

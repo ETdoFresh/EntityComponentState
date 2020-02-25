@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class TransformStateCompressed : AState
 {
+    public override State state { get; protected set; } = new TransformState();
+    public override DeltaState deltaState { get; protected set; } = new TransformDeltaState();
     private State previousState = new TransformState();
 
     [TextArea(2, 20)] public string stateString;
@@ -14,12 +16,6 @@ public class TransformStateCompressed : AState
 
     [TextArea(2, 20)] public string deltaStateString;
     [TextArea(2, 20)] public string deltaStateBytes;
-
-    private void OnEnable()
-    {
-        state = new TransformState();
-        deltaState = new TransformDeltaState();
-    }
 
     private void Update()
     {
