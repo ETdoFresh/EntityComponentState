@@ -55,6 +55,7 @@ namespace EntityComponentState
         public void FromBytes(ByteQueue bytes)
         {
             tick = bytes.GetInt();
+            entities.Clear();
             entities.FromBytes(bytes);
 
             foreach (var componentType in types)

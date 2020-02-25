@@ -56,6 +56,8 @@ namespace EntityComponentState
 
         public void Clear()
         {
+            startState.tick = 0;
+            endState.tick = 0;
             startState.entities.Clear();
             endState.entities.Clear();
             spawns.Clear();
@@ -140,6 +142,9 @@ namespace EntityComponentState
 
             if (storedStartState == null)
                 throw new ArgumentException("If not start state passed, delta state cannot reconstruct end state");
+
+            if (storedStartState.tick != startState.tick)
+                throw new ArgumentException($"Cannot build tick {endState.tick} from tick {storedStartState.tick}. Expecting tick {startState.tick}.");
 
             startState.entities.AddRange(storedStartState.entities.Clone());
             endState.entities.AddRange(storedStartState.entities.Union(spawns).Except(despawns));

@@ -44,6 +44,7 @@ public class ReadDeltaStateFromFile : MonoBehaviour
         }
         catch // if cannot read or previousState not yet set
         {
+            deltaState.Clear();
             var bytes = new byte[stateFile.Length];
             stateFile.Position = 0;
             stateFile.Read(bytes, 0, (int)stateFile.Length);
@@ -93,12 +94,10 @@ public class ReadDeltaStateFromFile : MonoBehaviour
     private void DespawnEntities()
     {
         var state = deltaState != null && deltaState.endState != empty ? deltaState.endState : stateMB.state;
-        var despawns = clones.Where(clone => !state.entities.Any(entity => clone.entityId == entity.id));
+        var a = state.entities.Any(e => e.id == 1);
+        var despawns = clones.Where(clone => !state.entities.Any(entity => entity.id == clone.entityId));
         foreach (var despawn in despawns)
-        {
-            clones.Remove(despawn);
             Destroy(despawn.gameObject);
-        }
     }
 
     private void ApplyChangesToEntites()
