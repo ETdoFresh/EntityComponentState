@@ -968,6 +968,7 @@ MonoBehaviour:
   count: 0
   clones: []
   isPlaying: 1
+  isLive: 0
 --- !u!4 &915070703
 Transform:
   m_ObjectHideFlags: 0

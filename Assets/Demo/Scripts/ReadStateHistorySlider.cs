@@ -17,16 +17,17 @@ public class ReadStateHistorySlider : MonoBehaviour
 
     private void Update()
     {
+        slider.maxValue = readStateFromStateHistoryFile.count;
         if (IsPlaying)
         {
             if (readStateFromStateHistoryFile.count > 0)
             {
-                slider.value = (float)readStateFromStateHistoryFile.countPosition / readStateFromStateHistoryFile.count;
+                slider.value = readStateFromStateHistoryFile.countPosition;
             }
         }
         else
         {
-            readStateFromStateHistoryFile.countPosition = Mathf.RoundToInt(slider.value * readStateFromStateHistoryFile.count);
+            readStateFromStateHistoryFile.countPosition = Mathf.RoundToInt(slider.value);
         }
     }
 

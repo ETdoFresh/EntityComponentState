@@ -14,6 +14,7 @@ public class ReadStateFromStateHistoryFile : MonoBehaviour
     public List<StateClone> clones = new List<StateClone>();
     private FileStream stateHistoryFile;
     public bool isPlaying = true;
+    public bool isLive = false;
 
     private void OnEnable()
     {
@@ -35,7 +36,10 @@ public class ReadStateFromStateHistoryFile : MonoBehaviour
             count = StateHistory.GetCountFromBytes(new ByteQueue(bytes));
             if (count > 0)
             {
-                countPosition = Math.Min(countPosition, count);
+                if (isLive && isPlaying)
+                    countPosition = count - 1;
+                else
+                    countPosition = Math.Min(countPosition, count - 1);
                 state = StateHistory.GetStateFromBytes<TransformState>(new ByteQueue(bytes), countPosition);
                 SpawnEntities();
                 DespawnEntities();
