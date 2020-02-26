@@ -13,6 +13,7 @@ public class WriteDeltaStateToFile : MonoBehaviour
     {
         if (!aState) aState = GetComponent<StateMB>();
         deltaStateFile = File.Open(FILE, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
+        deltaStateFile.SetLength(0);
     }
 
     private void OnDisable()

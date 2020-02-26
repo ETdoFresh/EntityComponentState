@@ -82,5 +82,12 @@ namespace EntityComponentState
             bytes.RemoveRange(0, positions[positions.Count - 1]);
             return bytes.GetIToBytes<T>(typeof(T));
         }
+
+        public static int GetCountFromBytes(ByteQueue bytes)
+        {
+            var positions = new SerializableListInt();
+            positions.FromBytes(bytes);
+            return positions.Count;
+        }
     }
 }

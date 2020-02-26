@@ -8,9 +8,12 @@ using static TransformStateCompressed;
 
 public class ReadStateFromStateHistoryFile : MonoBehaviour
 {
+    public int countPosition;
+    public int count;
     public TransformState state = new TransformState();
     public List<StateClone> clones = new List<StateClone>();
     private FileStream stateHistoryFile;
+    public bool isPlaying = true;
 
     private void OnEnable()
     {
@@ -29,14 +32,21 @@ public class ReadStateFromStateHistoryFile : MonoBehaviour
             var bytes = new byte[stateHistoryFile.Length];
             stateHistoryFile.Position = 0;
             stateHistoryFile.Read(bytes, 0, (int)stateHistoryFile.Length);
-            state = StateHistory.GetLatestStateFromBytes<TransformState>(new ByteQueue(bytes));
-            SpawnEntities();
-            DespawnEntities();
-            ApplyChangesToEntites();
+            count = StateHistory.GetCountFromBytes(new ByteQueue(bytes));
+            if (count > 0)
+            {
+                countPosition = Math.Min(countPosition, count);
+                state = StateHistory.GetStateFromBytes<TransformState>(new ByteQueue(bytes), countPosition);
+                SpawnEntities();
+                DespawnEntities();
+                ApplyChangesToEntites();
+            }
         }
         catch
         {
         }
+        if (isPlaying)
+            countPosition++;
     }
 
     private void SpawnEntities()

@@ -14,6 +14,7 @@ public class WriteStateToFile : MonoBehaviour
     {
         if (!aState) aState = GetComponent<StateMB>();
         file = File.Open(FILE, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
+        file.SetLength(0);
     }
 
     private void OnDisable()

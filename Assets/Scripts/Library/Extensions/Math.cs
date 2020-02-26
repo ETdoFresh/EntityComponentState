@@ -36,5 +36,7 @@ namespace EntityComponentState
         {
             return Convert.ToByte(MathSys.Ceiling(value));
         }
+
+        public static int Min(int val1, int val2) => MathSys.Min(val1, val2);
     }
 }

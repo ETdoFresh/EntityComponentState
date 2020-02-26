@@ -13,6 +13,7 @@ public class WriteStateHistoryToFile : MonoBehaviour
     {
         if (!stateHistoryMB) stateHistoryMB = GetComponent<StateHistoryMB>();
         stateHistoryFile = File.Open(FILE, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
+        stateHistoryFile.SetLength(0);
     }
 
     private void OnDisable()
