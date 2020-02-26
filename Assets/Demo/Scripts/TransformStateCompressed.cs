@@ -17,7 +17,7 @@ public class TransformStateCompressed : StateMB
     [TextArea(2, 20)] public string deltaStateString;
     [TextArea(2, 20)] public string deltaStateBytes;
 
-    private void Update()
+    private void FixedUpdate()
     {
         state.tick++;
         state.entities.Clear();

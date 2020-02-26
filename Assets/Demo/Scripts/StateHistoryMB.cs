@@ -13,7 +13,7 @@ namespace EntityComponentState
             if (!stateMB) stateMB = GetComponent<StateMB>();
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             stateHistory.Add(stateMB.state.Clone());
         }

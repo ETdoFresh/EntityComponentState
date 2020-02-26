@@ -1,18 +1,19 @@
 ﻿using System.Linq;
+using System.Text;
 
 namespace EntityComponentState
 {
     public class StateHistory : IToBytes
     {
-        protected SerializableListInt positions = new SerializableListInt();
-        protected SerializableList<State> states = new SerializableList<State>();
+        public static readonly byte[] STATE_DELIMITER = Encoding.UTF8.GetBytes("<EOL>");
 
         public int LatestTick => states.Max(state => state.tick);
         public State LatestState => states.FirstOrDefault(state => state.tick == LatestTick);
 
+        protected SerializableList<State> states = new SerializableList<State>();
+
         public void Add(State state)
         {
-            positions.Add(states.ToBytes().Count);
             states.Add(state);
         }
 
@@ -23,16 +24,6 @@ namespace EntityComponentState
 
         public void RemoveRange(int index, int count)
         {
-            var newBaseIndex = index + count;
-            if (newBaseIndex < positions.Count)
-            {
-                var position = positions[newBaseIndex];
-                var basePosition = positions[index];
-                var delta = position - basePosition;
-                for (int i = newBaseIndex; i < positions.Count; i++)
-                    positions[i] -= delta;
-            }
-            positions.RemoveRange(index, count);
             states.RemoveRange(index, count);
         }
 
@@ -56,38 +47,66 @@ namespace EntityComponentState
         public ByteQueue ToBytes()
         {
             var bytes = new ByteQueue();
-            bytes.Enqueue(positions);
-            bytes.Enqueue(states);
+            for (int i = 0; i < states.Count; i++)
+            {
+                if (i > 0) bytes.Enqueue(STATE_DELIMITER);
+                bytes.Enqueue(states[i]);
+            }
             return bytes;
         }
 
         public void FromBytes(ByteQueue bytes)
         {
-            positions.FromBytes(bytes);
-            states.FromBytes(bytes);
+            states.Clear();
+            states.Add(bytes.GetIToBytes<State>(states.type));
+            while (bytes.StartsWith(STATE_DELIMITER))
+            {
+                bytes.GetBytes(STATE_DELIMITER.Length);
+                states.Add(bytes.GetIToBytes<State>(states.type));
+            }
         }
 
         public static T GetStateFromBytes<T>(ByteQueue bytes, int tick) where T : State
         {
-            var positions = new SerializableListInt();
-            positions.FromBytes(bytes);
-            bytes.RemoveRange(0, positions[tick]);
-            return bytes.GetIToBytes<T>(typeof(T));
+            if (tick == 0)
+                return bytes.GetIToBytes<T>(typeof(T));
+
+            var currentTick = 0;
+            while (bytes.Count > 0)
+            {
+                if (bytes.StartsWith(STATE_DELIMITER))
+                    currentTick++;
+
+                if (currentTick == tick)
+                {
+                    bytes.GetBytes(STATE_DELIMITER.Length);
+                    return bytes.GetIToBytes<T>(typeof(T));
+                }
+
+                bytes.GetByte();
+            }
+            return null;
         }
 
         public static T GetLatestStateFromBytes<T>(ByteQueue bytes) where T : State
         {
-            var positions = new SerializableListInt();
-            positions.FromBytes(bytes);
-            bytes.RemoveRange(0, positions[positions.Count - 1]);
-            return bytes.GetIToBytes<T>(typeof(T));
+            return GetStateFromBytes<T>(bytes, GetCountFromBytes(new ByteQueue(bytes)));
         }
 
         public static int GetCountFromBytes(ByteQueue bytes)
         {
-            var positions = new SerializableListInt();
-            positions.FromBytes(bytes);
-            return positions.Count;
+            if (bytes.Count == 0)
+                return 0;
+
+            var count = 1;
+            while (bytes.Count > 0)
+            {
+                if (bytes.StartsWith(STATE_DELIMITER))
+                    count++;
+
+                bytes.GetByte();
+            }
+            return count;
         }
     }
 }

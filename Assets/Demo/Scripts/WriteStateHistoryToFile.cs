@@ -1,5 +1,6 @@
 ﻿using EntityComponentState;
 using System.IO;
+using System.Text;
 using UnityEngine;
 
 public class WriteStateHistoryToFile : MonoBehaviour
@@ -21,12 +22,15 @@ public class WriteStateHistoryToFile : MonoBehaviour
         stateHistoryFile.Close();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         try
         {
-            stateHistoryFile.Position = 0;
-            stateHistoryFile.Write(stateHistoryMB.stateHistory.ToBytes().ToArray(), 0, stateHistoryMB.stateHistory.ToBytes().Count);
+            if (stateHistoryFile.Length > 0)
+                stateHistoryFile.Write(StateHistory.STATE_DELIMITER, 0, StateHistory.STATE_DELIMITER.Length);
+
+            var latestState = stateHistoryMB.stateHistory.LatestState.ToBytes().ToArray();
+            stateHistoryFile.Write(latestState, 0, latestState.Length);
         }
         catch
         {

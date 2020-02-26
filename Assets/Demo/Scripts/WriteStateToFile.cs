@@ -22,7 +22,7 @@ public class WriteStateToFile : MonoBehaviour
         file.Close();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         try
         {

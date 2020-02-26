@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace EntityComponentState
@@ -8,7 +7,7 @@ namespace EntityComponentState
     public class ByteQueue : List<byte>
     {
         public ByteQueue() : base() { }
-        public ByteQueue(IEnumerable<byte> bytes) : base(bytes) { }
+        public ByteQueue(IEnumerable<byte> value) : base(value) { }
         public ByteQueue(byte value) : base() { Enqueue(value); }
         public ByteQueue(bool value) : base() { Enqueue(value); }
         public ByteQueue(short value) : base() { Enqueue(value); }
@@ -22,73 +21,32 @@ namespace EntityComponentState
 
         public byte GetByte()
         {
-            var size = 1;
-            var value = this.Take(size).First();
-            RemoveRange(0, size);
+            var value = this[0];
+            RemoveAt(0);
             return value;
         }
 
-        public bool GetBool()
+        public byte[] GetBytes(int count)
         {
-            var size = 1;
-            var value = BitConverter.ToBoolean(this.Take(size).ToArray(), 0);
-            RemoveRange(0, size);
-            return value;
+            var bytes = new byte[count];
+            for (int i = 0; i < count; i++)
+                bytes[i] = this[i];
+            RemoveRange(0, count);
+            return bytes;
         }
 
-        public short GetShort()
-        {
-            var size = 2;
-            var value = BitConverter.ToInt16(this.Take(size).ToArray(), 0);
-            RemoveRange(0, size);
-            return value;
-        }
-
-        public ushort GetUShort()
-        {
-            var size = 2;
-            var value = BitConverter.ToUInt16(this.Take(size).ToArray(), 0);
-            RemoveRange(0, size);
-            return value;
-        }
-
-        public int GetInt()
-        {
-            var size = 4;
-            var value = BitConverter.ToInt32(this.Take(size).ToArray(), 0);
-            RemoveRange(0, size);
-            return value;
-        }
-
-        public uint GetUInt()
-        {
-            var size = 4;
-            var value = BitConverter.ToUInt32(this.Take(size).ToArray(), 0);
-            RemoveRange(0, size);
-            return value;
-        }
-
-        public float GetFloat()
-        {
-            var size = 4;
-            var value = BitConverter.ToSingle(this.Take(size).ToArray(), 0);
-            RemoveRange(0, size);
-            return value;
-        }
-
-        public double GetDouble()
-        {
-            var size = 8;
-            var value = BitConverter.ToDouble(this.Take(size).ToArray(), 0);
-            RemoveRange(0, size);
-            return value;
-        }
-
+        public bool GetBool() => BitConverter.ToBoolean(GetBytes(1), 0);
+        public short GetShort() => BitConverter.ToInt16(GetBytes(2), 0);
+        public ushort GetUShort() => BitConverter.ToUInt16(GetBytes(2), 0);
+        public int GetInt() => BitConverter.ToInt32(GetBytes(4), 0);
+        public uint GetUInt() => BitConverter.ToUInt32(GetBytes(4), 0);
+        public float GetFloat() => BitConverter.ToSingle(GetBytes(4), 0);
+        public double GetDouble() => BitConverter.ToDouble(GetBytes(8), 0);
+        
         public string GetString()
         {
-            var count = BitConverter.ToInt32(this.Take(4).ToArray(), 0);
-            var value = Encoding.UTF8.GetString(this.Skip(4).Take(count).ToArray());
-            RemoveRange(0, 4 + count);
+            var count = BitConverter.ToInt32(GetBytes(4), 0);
+            var value = Encoding.UTF8.GetString(GetBytes(count));
             return value;
         }
 
@@ -99,35 +57,8 @@ namespace EntityComponentState
             return instance;
         }
 
-        public float GetCompressedSingle(float minRange, float maxRange, int bytes)
-        {
-            if (bytes >= 4) return GetFloat();
-            var range = maxRange - minRange;
-            if (bytes == 1)
-            {
-                var unitIncrement = range / 256;
-                var normalized = this.Take(1).First();
-                this.RemoveRange(0, bytes);
-                return normalized * unitIncrement + minRange;
-            }
-            if (bytes == 2)
-            {
-                var unitIncrement = range / 65536;
-                var normalized = BitConverter.ToUInt16(this.Take(2).ToArray(), 0);
-                this.RemoveRange(0, bytes);
-                return normalized * unitIncrement + minRange;
-            }
-            if (bytes == 3)
-            {
-                var unitIncrement = range / 16777216;
-                var normalized = BitConverter.ToUInt32(this.Take(2).ToArray(), 0);
-                this.RemoveRange(0, bytes);
-                return normalized * unitIncrement + minRange;
-            }
-            throw new Exception("GetCompressedSingle(), bytes must be > 0");
-        }
-
         public void Enqueue(byte value) => Add(value);
+        public void Enqueue(IEnumerable<byte> value) => AddRange(value);
         public void Enqueue(bool value) => AddRange(BitConverter.GetBytes(value));
         public void Enqueue(short value) => AddRange(BitConverter.GetBytes(value));
         public void Enqueue(ushort value) => AddRange(BitConverter.GetBytes(value));
@@ -146,6 +77,21 @@ namespace EntityComponentState
                 output += $"{@byte:x2}";
 
             return output;
+        }
+
+        public bool StartsWith(byte[] bytes)
+        {
+            if (bytes.Length > Count)
+                return false;
+
+            if (bytes.Length == 0)
+                return false;
+
+            for (int i = 0; i < bytes.Length; i++)
+                if (bytes[i] != this[i])
+                    return false;
+
+            return true;
         }
     }
 }

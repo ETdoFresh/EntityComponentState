@@ -21,7 +21,7 @@ public class WriteDeltaStateToFile : MonoBehaviour
         deltaStateFile.Close();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         var state = aState.state;
         try
