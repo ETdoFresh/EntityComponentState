@@ -44,15 +44,15 @@ public class ReadDeltaStateFromFile : MonoBehaviour
         ((TransformStateCompressed)stateMB).deltaStateString = deltaState.ToString();
         ((TransformStateCompressed)stateMB).deltaStateBytes = $"{deltaState.ToBytes().ToHexString()} [{deltaState.ToString()}]";
 
-        if (deltaState.startState.tick == startState.tick)
+        if (deltaState.startStateTick == startState.tick)
         {
-            SpawnEntities(deltaState.endState);
-            DespawnEntities(deltaState.endState);
-            ApplyChangesToEntites(deltaState.endState);
+            var endState = deltaState.GenerateEndState(startState);
+            SpawnEntities(endState);
+            DespawnEntities(endState);
+            ApplyChangesToEntites(endState);
         }
-        else if (deltaState.startState.tick > startState.tick)
+        else if (deltaState.startStateTick > startState.tick)
         {
-            
             SpawnEntities(stateMB.state);
             DespawnEntities(stateMB.state);
             ApplyChangesToEntites(stateMB.state);

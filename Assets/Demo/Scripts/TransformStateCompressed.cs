@@ -61,9 +61,8 @@ public class TransformStateCompressed : StateMB
 
     public class TransformDeltaState : DeltaState
     {
+        protected override IEnumerable<Type> componentTypes => TransformState.TYPES;
         public TransformDeltaState() { }
         public TransformDeltaState(State startState, State endState) : base(startState, endState) { }
-        public override State startState { get; protected set; } = new TransformState();
-        public override State endState { get; protected set; } = new TransformState();
     }
 }
