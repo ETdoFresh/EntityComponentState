@@ -42,6 +42,16 @@ public class TransformStateUncompressed : StateMB
             typeof(Name),
             typeof(Primitive)
         };
-        public override IEnumerable<Type> types { get; protected set; } = TYPES;
+        public override IEnumerable<Type> componentTypes => TYPES;
+        public override Type deltaType => typeof(TransformDeltaState);
+    }
+
+    public class TransformDeltaState : DeltaState
+    {
+        public override IEnumerable<Type> componentTypes => TransformState.TYPES;
+        public override Type stateType => typeof(TransformState);
+
+        public TransformDeltaState() { }
+        public TransformDeltaState(State startState, State endState) : base(startState, endState) { }
     }
 }

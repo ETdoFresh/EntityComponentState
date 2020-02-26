@@ -9,7 +9,8 @@ namespace EntityComponentState
         public int tick;
 
         public virtual SerializableListEntity entities { get; protected set; } = new SerializableListEntity();
-        public abstract IEnumerable<Type> types { get; protected set; }
+        public abstract IEnumerable<Type> componentTypes { get; }
+        public abstract Type deltaType { get; }
 
         public virtual void Clear()
         {
@@ -22,14 +23,13 @@ namespace EntityComponentState
             var state = (State)Activator.CreateInstance(GetType());
             state.tick = tick;
             state.entities = entities.Clone();
-            state.types = types;
             return state;
         }
 
         public override string ToString()
         {
             var output = $"State [Tick: {tick}]\r\n";
-            foreach (var componentType in types)
+            foreach (var componentType in componentTypes)
             {
                 output += $"  {componentType.Name}\r\n";
                 foreach (var entity in entities)
@@ -45,7 +45,7 @@ namespace EntityComponentState
             bytes.Enqueue(tick);
             bytes.Enqueue(entities);
 
-            foreach (var componentType in types)
+            foreach (var componentType in componentTypes)
             {
                 foreach (var entity in entities)
                 {
@@ -64,7 +64,7 @@ namespace EntityComponentState
             entities.Clear();
             entities.FromBytes(bytes);
 
-            foreach (var componentType in types)
+            foreach (var componentType in componentTypes)
             {
                 foreach (var entity in entities)
                 {

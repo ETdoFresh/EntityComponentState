@@ -11,7 +11,8 @@ namespace EntityComponentState
         public virtual SerializableListEntity spawns { get; protected set; } = new SerializableListEntity();
         public virtual SerializableListEntity despawns { get; protected set; } = new SerializableListEntity();
 
-        protected abstract IEnumerable<Type> componentTypes { get; }
+        public abstract IEnumerable<Type> componentTypes { get; }
+        public abstract Type stateType { get; }
         private List<Change> changes = new List<Change>();
 
         public DeltaState() { }
@@ -34,7 +35,7 @@ namespace EntityComponentState
             despawns.AddRange(startEntities.Where(startEntity => !endEntities.Any(endEntity => startEntity.id == endEntity.id)));
 
             foreach (var endEntity in endState.entities)
-                foreach (var componentType in endState.types)
+                foreach (var componentType in endState.componentTypes)
                 {
                     var change = new Change { componentType = componentType, entityId = endEntity.id, delta = null };
                     changes.Add(change);
@@ -209,7 +210,10 @@ namespace EntityComponentState
 
             public override string ToString()
             {
-                return $"{entityId} {componentType.Name} {delta}";
+                if (delta != null)
+                    return $"{entityId} {componentType.Name} {delta}";
+                else
+                    return $"SKIP! {entityId} {componentType.Name}";
             }
         }
     }

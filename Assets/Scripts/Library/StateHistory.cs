@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 
 namespace EntityComponentState
@@ -9,6 +10,7 @@ namespace EntityComponentState
 
         public int LatestTick => states.Max(state => state.tick);
         public State LatestState => states.FirstOrDefault(state => state.tick == LatestTick);
+        public DeltaState LatestDeltaState => GetLatestDeltaState();
 
         protected SerializableList<State> states = new SerializableList<State>();
 
@@ -66,10 +68,23 @@ namespace EntityComponentState
             }
         }
 
+        private DeltaState GetLatestDeltaState()
+        {
+            if (states.Count <= 1)
+                return null;
+
+            var deltaState = (DeltaState)Activator.CreateInstance(states[0].deltaType);
+            deltaState.Create(states[states.Count - 2], states[states.Count - 1]);
+            return deltaState;
+        }
+
         public static T GetStateFromBytes<T>(ByteQueue bytes, int tick) where T : State
+            => (T)GetStateFromBytes(typeof(T), bytes, tick);
+
+        public static State GetStateFromBytes(Type type, ByteQueue bytes, int tick)
         {
             if (tick == 0)
-                return bytes.GetIToBytes<T>(typeof(T));
+                return bytes.GetIToBytes<State>(type);
 
             var currentTick = 0;
             while (bytes.Count > 0)
@@ -80,7 +95,7 @@ namespace EntityComponentState
                 if (currentTick == tick)
                 {
                     bytes.GetBytes(STATE_DELIMITER.Length);
-                    return bytes.GetIToBytes<T>(typeof(T));
+                    return bytes.GetIToBytes<State>(type);
                 }
 
                 bytes.GetByte();
@@ -91,6 +106,19 @@ namespace EntityComponentState
         public static T GetLatestStateFromBytes<T>(ByteQueue bytes) where T : State
         {
             return GetStateFromBytes<T>(bytes, GetCountFromBytes(new ByteQueue(bytes)));
+        }
+
+        public static T GetLatestDeltaStateFromBytes<T>(ByteQueue bytes) where T : DeltaState
+        {
+            var count = GetCountFromBytes(new ByteQueue(bytes));
+            if (count <= 1)
+                return null;
+
+            var deltaState = Activator.CreateInstance<T>();
+            var previousState = GetStateFromBytes(deltaState.stateType, new ByteQueue(bytes), count - 1);
+            var state = GetStateFromBytes(deltaState.stateType, bytes, count);
+            deltaState.Create(previousState, state);
+            return deltaState;
         }
 
         public static int GetCountFromBytes(ByteQueue bytes)
