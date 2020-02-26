@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Demo/Scenes/StateHistoryReplay.unity
+    guid: 20fd10d34a547c348986106bf43512e5
+  - enabled: 1
     path: Assets/Demo/Scenes/StateHistoryReadFromFile.unity
     guid: ab6bd877bd489594aa1407febb3d3a34
   - enabled: 1
