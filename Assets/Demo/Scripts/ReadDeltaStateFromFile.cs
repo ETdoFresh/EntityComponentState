@@ -6,10 +6,10 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-[RequireComponent(typeof(AState))]
+[RequireComponent(typeof(StateMB))]
 public class ReadDeltaStateFromFile : MonoBehaviour
 {
-    public AState stateMB;
+    public StateMB stateMB;
     public List<StateClone> clones = new List<StateClone>();
     private FileStream stateFile;
     private FileStream deltaStateFile;
@@ -17,8 +17,12 @@ public class ReadDeltaStateFromFile : MonoBehaviour
 
     private void OnEnable()
     {
-        if (!stateMB) stateMB = GetComponent<AState>();
+        if (!stateMB) stateMB = GetComponent<StateMB>();
         stateFile = File.Open(WriteStateToFile.FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        var bytes = new byte[stateFile.Length];
+        stateFile.Position = 0;
+        stateFile.Read(bytes, 0, (int)stateFile.Length);
+        stateMB.FromBytes(new ByteQueue(bytes));
         deltaStateFile = File.Open(WriteDeltaStateToFile.FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
     }
 
@@ -48,10 +52,7 @@ public class ReadDeltaStateFromFile : MonoBehaviour
         }
         else if (deltaState.startState.tick > startState.tick)
         {
-            bytes = new byte[stateFile.Length];
-            stateFile.Position = 0;
-            stateFile.Read(bytes, 0, (int)stateFile.Length);
-            stateMB.FromBytes(new ByteQueue(bytes));
+            
             SpawnEntities(stateMB.state);
             DespawnEntities(stateMB.state);
             ApplyChangesToEntites(stateMB.state);

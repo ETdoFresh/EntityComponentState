@@ -3,16 +3,16 @@ using System.Collections;
 using System.IO;
 using UnityEngine;
 
-[RequireComponent(typeof(AState))]
+[RequireComponent(typeof(StateMB))]
 public class WriteStateToFile : MonoBehaviour
 {
     public const string FILE = @"C:\Users\etgarcia\Desktop\EntityComponentState\state.bin";
-    public AState aState;
+    public StateMB aState;
     private FileStream file;
 
     private void OnEnable()
     {
-        if (!aState) aState = GetComponent<AState>();
+        if (!aState) aState = GetComponent<StateMB>();
         file = File.Open(FILE, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
     }
 

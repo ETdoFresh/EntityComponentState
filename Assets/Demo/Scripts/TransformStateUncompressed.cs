@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class TransformStateUncompressed : AState
+public class TransformStateUncompressed : StateMB
 {
     public override State state { get; protected set; } = new TransformState();
     //public override DeltaState deltaState { get; protected set; } = new TransformDeltaState();
