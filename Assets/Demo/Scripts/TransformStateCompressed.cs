@@ -21,7 +21,7 @@ public class TransformStateCompressed : StateMB
     {
         state.tick++;
         state.entities.Clear();
-        state.entities.AddRange(FindObjectsOfType<EntityMB>().Select(e => e.entity));
+        state.entities.AddRange(FindObjectsOfType<EntityMB>().Select(e => e.entity).OrderBy(e => e.id));
         stateString = state.ToString();
         stateBytes = $"{state.ToBytes().ToHexString()} [{state.ToBytes().Count}]";
 
