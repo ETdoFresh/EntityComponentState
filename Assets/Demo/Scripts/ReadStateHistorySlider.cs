@@ -5,41 +5,48 @@ using UnityEngine.UI;
 public class ReadStateHistorySlider : MonoBehaviour
 {
     public Slider slider;
-    public ReadStateFromStateHistoryFile readStateFromStateHistoryFile;
+    public ReadStateFromStateHistoryFile file1;
+    public ReadDeltaStateFromStateHistoryFile file2;
 
-    public bool IsPlaying => readStateFromStateHistoryFile.isPlaying;
+    public int Count => file1 ? file1.count : file2 ? file2.count : 0;
+    public int CountPosition => file1 ? file1.countPosition : file2 ? file2.tick : 0;
+    public bool IsPlaying => file1 && file1.isPlaying || file2 && file2.isPlaying;
 
     private void OnValidate()
     {
         if (!slider) slider = GetComponent<Slider>();
-        if (!readStateFromStateHistoryFile) readStateFromStateHistoryFile = FindObjectOfType<ReadStateFromStateHistoryFile>();
+        if (!file1) file1 = FindObjectOfType<ReadStateFromStateHistoryFile>();
+        if (!file2) file2 = FindObjectOfType<ReadDeltaStateFromStateHistoryFile>();
     }
 
     private void Update()
     {
-        slider.maxValue = readStateFromStateHistoryFile.count;
+        slider.maxValue = Count;
         if (IsPlaying)
         {
-            if (readStateFromStateHistoryFile.count > 0)
+            if (Count > 0)
             {
-                slider.value = readStateFromStateHistoryFile.countPosition;
+                slider.value = CountPosition;
             }
         }
         else
         {
-            readStateFromStateHistoryFile.countPosition = Mathf.RoundToInt(slider.value);
+            if (file1) file1.countPosition = Mathf.RoundToInt(slider.value);
+            if (file2) file2.tick = Mathf.RoundToInt(slider.value);
         }
     }
 
     public void TogglePlaying()
     {
-        if (readStateFromStateHistoryFile.countPosition >= readStateFromStateHistoryFile.count)
+        if (CountPosition >= Count)
         {
-            readStateFromStateHistoryFile.countPosition = 0;
+            if (file1) file1.countPosition = 0;
+            if (file2) file2.tick = 0;
         }
         else
         {
-            readStateFromStateHistoryFile.isPlaying = !IsPlaying;
+            if (file1) file1.isPlaying = !IsPlaying;
+            if (file2) file2.isPlaying = !IsPlaying;
         }
     }
 }

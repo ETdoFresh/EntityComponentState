@@ -4,46 +4,50 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using static TransformStateCompressed;
 
-[RequireComponent(typeof(StateMB))]
-public class ReadStateFromFile : MonoBehaviour
+public class ReadDeltaStateFromStateHistoryFile : MonoBehaviour
 {
-    public StateMB stateMB;
+    public int tick;
+    public int count;
+    public TransformState state = new TransformState();
     public List<StateClone> clones = new List<StateClone>();
-    public ByteQueue byteQueue = new ByteQueue();
-    private FileStream file;
+    private FileStream stateHistoryFile;
+    public bool isPlaying = true;
 
     private void OnEnable()
     {
-        if (!stateMB) stateMB = GetComponent<StateMB>();
-        file = File.Open(WriteStateToFile.FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        stateHistoryFile = File.Open(WriteDeltaStateHistoryToFile.FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
     }
 
     private void OnDisable()
     {
-        file.Close();
+        stateHistoryFile.Close();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        try
+        var bytes = new byte[stateHistoryFile.Length];
+        stateHistoryFile.Position = 0;
+        stateHistoryFile.Read(bytes, 0, (int)stateHistoryFile.Length);
+        count = DeltaStateHistory.GetCountFromBytes(new ByteQueue(bytes));
+        if (count > 0 && isPlaying)
         {
-            var bytes = new byte[file.Length];
-            file.Position = 0;
-            file.Read(bytes, 0, (int)file.Length);
-            stateMB.state.FromBytes(new ByteQueue(bytes));
-            SpawnEntities();
-            DespawnEntities();
-            ApplyChangesToEntites();
-        }
-        catch
-        {
+            var deltaState = DeltaStateHistory.GetDeltaStateFromBytes<TransformDeltaState>(new ByteQueue(bytes), state.tick);
+            if (deltaState != null)
+            {
+                state = (TransformState)deltaState.GenerateEndState(state);
+                SpawnEntities();
+                DespawnEntities();
+                ApplyChangesToEntites();
+            }
+            tick = state.tick;
         }
     }
 
     private void SpawnEntities()
     {
-        var spawns = stateMB.state.entities.Where(entity => !clones.Any(clone => clone.entityId == entity.id));
+        var spawns = state.entities.Where(entity => !clones.Any(clone => clone.entityId == entity.id));
         foreach (var spawn in spawns)
         {
             GameObject newGameObject = null;
@@ -74,7 +78,7 @@ public class ReadStateFromFile : MonoBehaviour
 
     private void DespawnEntities()
     {
-        var despawns = clones.Where(clone => !stateMB.state.entities.Any(entity => clone.entityId == entity.id));
+        var despawns = clones.Where(clone => !state.entities.Any(entity => clone.entityId == entity.id));
         foreach (var despawn in despawns)
         {
             clones.Remove(despawn);
@@ -84,7 +88,7 @@ public class ReadStateFromFile : MonoBehaviour
 
     private void ApplyChangesToEntites()
     {
-        foreach (var entity in stateMB.state.entities)
+        foreach (var entity in state.entities)
         {
             var clone = clones.First(c => c.entityId == entity.id);
             foreach (var component in entity.components)

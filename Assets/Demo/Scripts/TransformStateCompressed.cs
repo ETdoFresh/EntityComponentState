@@ -27,23 +27,12 @@ public class TransformStateCompressed : StateMB
 
         deltaState.Create(previousState, state);
         deltaStateString = deltaState.ToString();
-        deltaStateBytes = $"{deltaState.ToBytes().ToHexString()} [{deltaState.ToBytes().Count}]";
+        var deltaStateBytes = deltaState.ToBytes();
+        this.deltaStateBytes = $"{deltaStateBytes.ToHexString()} [{deltaStateBytes.Count}]";
 
         previousState.tick = state.tick;
         previousState.entities.Clear();
         previousState.entities.AddRange(state.entities.Clone());
-    }
-
-    public override ByteQueue ToBytes()
-    {
-        return state.ToBytes();
-    }
-
-    public override void FromBytes(ByteQueue bytes)
-    {
-        state.FromBytes(bytes);
-        stateString = state.ToString();
-        stateBytes = $"{state.ToBytes().ToHexString()} [{state.ToBytes().Count}]";
     }
 
     public class TransformState : CompressedState

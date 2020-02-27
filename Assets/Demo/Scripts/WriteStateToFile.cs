@@ -7,12 +7,12 @@ using UnityEngine;
 public class WriteStateToFile : MonoBehaviour
 {
     public const string FILE = @"C:\Users\etgarcia\Desktop\EntityComponentState\state.bin";
-    public StateMB aState;
+    public StateMB stateMB;
     private FileStream file;
 
     private void OnEnable()
     {
-        if (!aState) aState = GetComponent<StateMB>();
+        if (!stateMB) stateMB = GetComponent<StateMB>();
         file = File.Open(FILE, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
         file.SetLength(0);
     }
@@ -27,7 +27,8 @@ public class WriteStateToFile : MonoBehaviour
         try
         {
             file.Position = 0;
-            file.Write(aState.ToBytes().ToArray(), 0, aState.ToBytes().Count);
+            var stateBytes = stateMB.state.ToBytes().ToArray();
+            file.Write(stateBytes, 0, stateBytes.Length);
         }
         catch
         {

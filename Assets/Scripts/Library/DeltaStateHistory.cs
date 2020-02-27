@@ -4,18 +4,18 @@ using System.Text;
 
 namespace EntityComponentState
 {
-    public class StateHistory : IToBytes
+    public class DeltaStateHistory : IToBytes
     {
         public static readonly byte[] STATE_DELIMITER = Encoding.UTF8.GetBytes("<EOL>");
 
-        public int LatestTick => states.Max(state => state.tick);
-        public State LatestState => states.FirstOrDefault(state => state.tick == LatestTick);
+        public int LatestTick => deltaStates.Max(d => d.endStateTick);
+        public DeltaState LatestDeltaState => deltaStates.FirstOrDefault(d => d.endStateTick == LatestTick);
 
-        protected SerializableList<State> states = new SerializableList<State>();
+        protected SerializableList<DeltaState> deltaStates = new SerializableList<DeltaState>();
 
-        public void Add(State state)
+        public void Add(DeltaState deltaState)
         {
-            states.Add(state);
+            deltaStates.Add(deltaState);
         }
 
         public void RemoveAt(int index)
@@ -25,43 +25,43 @@ namespace EntityComponentState
 
         public void RemoveRange(int index, int count)
         {
-            states.RemoveRange(index, count);
+            deltaStates.RemoveRange(index, count);
         }
 
-        public State GetState(int tick)
+        public DeltaState GetDeltaState(int startStateTick)
         {
-            return states.Where(state => state.tick == tick).FirstOrDefault();
+            return deltaStates.Where(d => d.startStateTick == startStateTick).FirstOrDefault();
         }
 
         public ByteQueue ToBytes()
         {
             var bytes = new ByteQueue();
-            for (int i = 0; i < states.Count; i++)
+            for (int i = 0; i < deltaStates.Count; i++)
             {
                 if (i > 0) bytes.Enqueue(STATE_DELIMITER);
-                bytes.Enqueue(states[i]);
+                bytes.Enqueue(deltaStates[i]);
             }
             return bytes;
         }
 
         public void FromBytes(ByteQueue bytes)
         {
-            states.Clear();
-            states.Add(bytes.GetIToBytes<State>(states.type));
+            deltaStates.Clear();
+            deltaStates.Add(bytes.GetIToBytes<DeltaState>(deltaStates.type));
             while (bytes.StartsWith(STATE_DELIMITER))
             {
                 bytes.GetBytes(STATE_DELIMITER.Length);
-                states.Add(bytes.GetIToBytes<State>(states.type));
+                deltaStates.Add(bytes.GetIToBytes<DeltaState>(deltaStates.type));
             }
         }
 
-        public static T GetStateFromBytes<T>(ByteQueue bytes, int tick) where T : State
-            => (T)GetStateFromBytes(typeof(T), bytes, tick);
+        public static T GetDeltaStateFromBytes<T>(ByteQueue bytes, int startStateTick) where T : DeltaState
+            => (T)GetStateFromBytes(typeof(T), bytes, startStateTick);
 
-        public static State GetStateFromBytes(Type type, ByteQueue bytes, int tick)
+        public static DeltaState GetStateFromBytes(Type type, ByteQueue bytes, int startStateTick)
         {
-            if (tick == 0)
-                return bytes.GetIToBytes<State>(type);
+            if (startStateTick == 0)
+                return bytes.GetIToBytes<DeltaState>(type);
 
             var currentTick = 0;
             while (bytes.Count > 0)
@@ -69,10 +69,10 @@ namespace EntityComponentState
                 if (bytes.StartsWith(STATE_DELIMITER))
                     currentTick++;
 
-                if (currentTick == tick)
+                if (currentTick == startStateTick)
                 {
                     bytes.GetBytes(STATE_DELIMITER.Length);
-                    return bytes.GetIToBytes<State>(type);
+                    return bytes.GetIToBytes<DeltaState>(type);
                 }
 
                 bytes.GetByte();
@@ -80,9 +80,9 @@ namespace EntityComponentState
             return null;
         }
 
-        public static T GetLatestStateFromBytes<T>(ByteQueue bytes) where T : State
+        public static T GetLatestStateFromBytes<T>(ByteQueue bytes) where T : DeltaState
         {
-            return GetStateFromBytes<T>(bytes, GetCountFromBytes(new ByteQueue(bytes)));
+            return GetDeltaStateFromBytes<T>(bytes, GetCountFromBytes(new ByteQueue(bytes)));
         }
 
         public static int GetCountFromBytes(ByteQueue bytes)

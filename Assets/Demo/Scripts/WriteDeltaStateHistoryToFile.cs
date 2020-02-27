@@ -26,10 +26,14 @@ public class WriteDeltaStateHistoryToFile : MonoBehaviour
         try
         {
             if (deltaStateHistoryFile.Length > 0)
-                deltaStateHistoryFile.Write(StateHistory.STATE_DELIMITER, 0, StateHistory.STATE_DELIMITER.Length);
+                deltaStateHistoryFile.Write(DeltaStateHistory.STATE_DELIMITER, 0, DeltaStateHistory.STATE_DELIMITER.Length);
 
-            var latestDeltaState = stateHistoryMB.stateHistory.LatestDeltaState.ToBytes().ToArray();
-            deltaStateHistoryFile.Write(latestDeltaState, 0, latestDeltaState.Length);
+            var latestDeltaState = stateHistoryMB.deltaStateHistory.LatestDeltaState;
+            if (latestDeltaState.startStateTick != latestDeltaState.endStateTick)
+            {
+                var latestDeltaStateBytes = latestDeltaState.ToBytes().ToArray();
+                deltaStateHistoryFile.Write(latestDeltaStateBytes, 0, latestDeltaStateBytes.Length);
+            }
         }
         catch
         {

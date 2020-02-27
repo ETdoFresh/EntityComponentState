@@ -22,16 +22,6 @@ public class TransformStateUncompressed : StateMB
         stateBytes = $"{state.ToBytes().ToHexString()} [{state.ToBytes().Count}]";
     }
 
-    public override ByteQueue ToBytes()
-    {
-        return state.ToBytes();
-    }
-
-    public override void FromBytes(ByteQueue bytes)
-    {
-        state.FromBytes(bytes);
-    }
-
     public class TransformState : State
     {
         public static Type[] TYPES = new[]

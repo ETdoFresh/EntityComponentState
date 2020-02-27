@@ -22,7 +22,7 @@ public class ReadDeltaStateFromFile : MonoBehaviour
         var bytes = new byte[stateFile.Length];
         stateFile.Position = 0;
         stateFile.Read(bytes, 0, (int)stateFile.Length);
-        stateMB.FromBytes(new ByteQueue(bytes));
+        stateMB.state.FromBytes(new ByteQueue(bytes));
         deltaStateFile = File.Open(WriteDeltaStateToFile.FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
     }
 
@@ -40,7 +40,7 @@ public class ReadDeltaStateFromFile : MonoBehaviour
         var bytes = new byte[deltaStateFile.Length];
         deltaStateFile.Position = 0;
         deltaStateFile.Read(bytes, 0, (int)deltaStateFile.Length);
-        deltaState.FromBytes(new ByteQueue(bytes), startState);
+        deltaState.FromBytes(new ByteQueue(bytes));
         ((TransformStateCompressed)stateMB).deltaStateString = deltaState.ToString();
         ((TransformStateCompressed)stateMB).deltaStateBytes = $"{deltaState.ToBytes().ToHexString()} [{deltaState.ToString()}]";
 

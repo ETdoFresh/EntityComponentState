@@ -534,7 +534,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfd9e75adb7c7c1459eb0dfae9e12a07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aState: {fileID: 915070705}
+  stateMB: {fileID: 915070705}
 --- !u!114 &915070705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -549,6 +549,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stateString: 
   stateBytes: 
+  deltaStateString: 
+  deltaStateBytes: 
 --- !u!114 &915070706
 MonoBehaviour:
   m_ObjectHideFlags: 0

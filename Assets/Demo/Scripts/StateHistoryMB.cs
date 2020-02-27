@@ -7,6 +7,7 @@ namespace EntityComponentState
     {
         public StateMB stateMB;
         public StateHistory stateHistory = new StateHistory();
+        public DeltaStateHistory deltaStateHistory = new DeltaStateHistory();
 
         private void OnValidate()
         {
@@ -16,6 +17,7 @@ namespace EntityComponentState
         private void FixedUpdate()
         {
             stateHistory.Add(stateMB.state.Clone());
+            deltaStateHistory.Add(stateMB.deltaState.Clone());
         }
     }
 }
