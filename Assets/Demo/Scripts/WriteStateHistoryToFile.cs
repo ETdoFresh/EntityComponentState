@@ -27,7 +27,7 @@ public class WriteStateHistoryToFile : MonoBehaviour
         try
         {
             if (stateHistoryFile.Length > 0)
-                stateHistoryFile.Write(StateHistory.STATE_DELIMITER, 0, StateHistory.STATE_DELIMITER.Length);
+                stateHistoryFile.Write(StateHistory<State>.STATE_DELIMITER, 0, StateHistory<State>.STATE_DELIMITER.Length);
 
             var latestState = stateHistoryMB.stateHistory.LatestState.ToBytes().ToArray();
             stateHistoryFile.Write(latestState, 0, latestState.Length);

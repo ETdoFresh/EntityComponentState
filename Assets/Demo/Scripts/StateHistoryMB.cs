@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static TransformStateCompressed;
 
 namespace EntityComponentState
 {
@@ -6,8 +7,8 @@ namespace EntityComponentState
     public class StateHistoryMB : MonoBehaviour
     {
         public StateMB stateMB;
-        public StateHistory stateHistory = new StateHistory();
-        public DeltaStateHistory deltaStateHistory = new DeltaStateHistory();
+        public StateHistory<TransformState> stateHistory = new StateHistory<TransformState>();
+        public DeltaStateHistory<TransformDeltaState> deltaStateHistory = new DeltaStateHistory<TransformDeltaState>();
 
         private void OnValidate()
         {
@@ -16,8 +17,8 @@ namespace EntityComponentState
 
         private void FixedUpdate()
         {
-            stateHistory.Add(stateMB.state.Clone());
-            deltaStateHistory.Add(stateMB.deltaState.Clone());
+            stateHistory.Add((TransformState)stateMB.state.Clone());
+            deltaStateHistory.Add((TransformDeltaState)stateMB.deltaState.Clone());
         }
     }
 }

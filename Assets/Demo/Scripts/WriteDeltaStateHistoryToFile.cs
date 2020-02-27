@@ -26,7 +26,7 @@ public class WriteDeltaStateHistoryToFile : MonoBehaviour
         try
         {
             if (deltaStateHistoryFile.Length > 0)
-                deltaStateHistoryFile.Write(DeltaStateHistory.STATE_DELIMITER, 0, DeltaStateHistory.STATE_DELIMITER.Length);
+                deltaStateHistoryFile.Write(DeltaStateHistory<DeltaState>.STATE_DELIMITER, 0, DeltaStateHistory<DeltaState>.STATE_DELIMITER.Length);
 
             var latestDeltaState = stateHistoryMB.deltaStateHistory.LatestDeltaState;
             if (latestDeltaState.startStateTick != latestDeltaState.endStateTick)

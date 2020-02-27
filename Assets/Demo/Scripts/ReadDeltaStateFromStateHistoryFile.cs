@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Profiling;
 using static TransformStateCompressed;
 
 public class ReadDeltaStateFromStateHistoryFile : MonoBehaviour
@@ -14,6 +15,8 @@ public class ReadDeltaStateFromStateHistoryFile : MonoBehaviour
     public List<StateClone> clones = new List<StateClone>();
     private FileStream stateHistoryFile;
     public bool isPlaying = true;
+    public byte[] bytes = new byte[0];
+    public DeltaStateHistory<TransformDeltaState> deltaStateHistory = new DeltaStateHistory<TransformDeltaState>();
 
     private void OnEnable()
     {
@@ -27,13 +30,17 @@ public class ReadDeltaStateFromStateHistoryFile : MonoBehaviour
 
     private void FixedUpdate()
     {
-        var bytes = new byte[stateHistoryFile.Length];
-        stateHistoryFile.Position = 0;
-        stateHistoryFile.Read(bytes, 0, (int)stateHistoryFile.Length);
-        count = DeltaStateHistory.GetCountFromBytes(new ByteQueue(bytes));
+        if (bytes.Length != stateHistoryFile.Length)
+        {
+            bytes = new byte[stateHistoryFile.Length];
+            stateHistoryFile.Position = 0;
+            stateHistoryFile.Read(bytes, 0, (int)stateHistoryFile.Length);
+            deltaStateHistory.FromBytes(new ByteQueue(bytes));
+            count = deltaStateHistory.LatestTick;
+        }
         if (count > 0 && isPlaying)
         {
-            var deltaState = DeltaStateHistory.GetDeltaStateFromBytes<TransformDeltaState>(new ByteQueue(bytes), state.tick);
+            var deltaState = deltaStateHistory.GetDeltaState(state.tick);
             if (deltaState != null)
             {
                 state = (TransformState)deltaState.GenerateEndState(state);

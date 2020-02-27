@@ -4,16 +4,16 @@ using System.Text;
 
 namespace EntityComponentState
 {
-    public class StateHistory : IToBytes
+    public class StateHistory<T> : IToBytes where T : State
     {
         public static readonly byte[] STATE_DELIMITER = Encoding.UTF8.GetBytes("<EOL>");
 
         public int LatestTick => states.Max(state => state.tick);
         public State LatestState => states.FirstOrDefault(state => state.tick == LatestTick);
 
-        protected SerializableList<State> states = new SerializableList<State>();
+        protected SerializableList<T> states = new SerializableList<T>();
 
-        public void Add(State state)
+        public void Add(T state)
         {
             states.Add(state);
         }
@@ -47,11 +47,11 @@ namespace EntityComponentState
         public void FromBytes(ByteQueue bytes)
         {
             states.Clear();
-            states.Add(bytes.GetIToBytes<State>(states.type));
+            states.Add(bytes.GetIToBytes<T>(typeof(T)));
             while (bytes.StartsWith(STATE_DELIMITER))
             {
                 bytes.GetBytes(STATE_DELIMITER.Length);
-                states.Add(bytes.GetIToBytes<State>(states.type));
+                states.Add(bytes.GetIToBytes<T>(typeof(T)));
             }
         }
 
@@ -66,6 +66,7 @@ namespace EntityComponentState
             var currentTick = 0;
             while (bytes.Count > 0)
             {
+
                 if (bytes.StartsWith(STATE_DELIMITER))
                     currentTick++;
 

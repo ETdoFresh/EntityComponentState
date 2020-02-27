@@ -4,17 +4,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Profiling;
 using static TransformStateCompressed;
 
 public class ReadStateFromStateHistoryFile : MonoBehaviour
 {
     public int countPosition;
     public int count;
-    public TransformState state = new TransformState();
+    public State state = new TransformState();
     public List<StateClone> clones = new List<StateClone>();
     private FileStream stateHistoryFile;
     public bool isPlaying = true;
     public bool isLive = false;
+    public byte[] bytes = new byte[0];
+    public StateHistory<TransformState> stateHistory = new StateHistory<TransformState>();
 
     private void OnEnable()
     {
@@ -30,17 +33,22 @@ public class ReadStateFromStateHistoryFile : MonoBehaviour
     {
         try
         {
-            var bytes = new byte[stateHistoryFile.Length];
-            stateHistoryFile.Position = 0;
-            stateHistoryFile.Read(bytes, 0, (int)stateHistoryFile.Length);
-            count = StateHistory.GetCountFromBytes(new ByteQueue(bytes));
+            if (bytes.Length != stateHistoryFile.Length)
+            {
+                bytes = new byte[stateHistoryFile.Length];
+                stateHistoryFile.Position = 0;
+                stateHistoryFile.Read(bytes, 0, (int)stateHistoryFile.Length);
+                stateHistory.FromBytes(new ByteQueue(bytes));
+                count = stateHistory.LatestTick;
+            }
+
             if (count > 0)
             {
                 if (isLive && isPlaying)
                     countPosition = count - 1;
                 else
                     countPosition = Math.Min(countPosition, count - 1);
-                state = StateHistory.GetStateFromBytes<TransformState>(new ByteQueue(bytes), countPosition);
+                state = stateHistory.GetState(countPosition);
                 SpawnEntities();
                 DespawnEntities();
                 ApplyChangesToEntites();
