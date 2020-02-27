@@ -9,6 +9,7 @@ namespace EntityComponentState.Unity
     public class PrimitiveMB : ComponentMB<Primitive>
     {
         public UnityPrimitiveType value;
+        private Mesh mesh;
         public MeshFilter meshFilter;
 
         protected override void OnEnable()
@@ -19,6 +20,10 @@ namespace EntityComponentState.Unity
 
         private void Update()
         {
+            // Saves on garbage collection
+            if (mesh == meshFilter.mesh)
+                return;
+
             var meshName = meshFilter.mesh.name;
             if (meshName.StartsWith("Sphere"))
                 component.primitiveType = PrimitiveType.Sphere;
@@ -34,6 +39,7 @@ namespace EntityComponentState.Unity
                 component.primitiveType = PrimitiveType.Quad;
 
             value = (UnityPrimitiveType)(int)component.primitiveType;
+            mesh = meshFilter.mesh;
         }
     }
 }

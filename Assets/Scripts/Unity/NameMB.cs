@@ -6,7 +6,9 @@
 
         private void Update()
         {
-            value = component.name = name;
+            // Saves on garbage collection
+            if (value != name || component.name != name)
+                value = component.name = name;
         }
     }
 }

@@ -55,7 +55,7 @@ namespace EntityComponentState
             }
         }
 
-        public static T GetDeltaStateFromBytes<T>(ByteQueue bytes, int startStateTick) where T : DeltaState
+        public static T GetDeltaStateFromBytes(ByteQueue bytes, int startStateTick)
             => (T)GetStateFromBytes(typeof(T), bytes, startStateTick);
 
         public static DeltaState GetStateFromBytes(Type type, ByteQueue bytes, int startStateTick)
@@ -80,9 +80,9 @@ namespace EntityComponentState
             return null;
         }
 
-        public static T GetLatestStateFromBytes<T>(ByteQueue bytes) where T : DeltaState
+        public static T GetLatestStateFromBytes(ByteQueue bytes)
         {
-            return GetDeltaStateFromBytes<T>(bytes, GetCountFromBytes(new ByteQueue(bytes)));
+            return GetDeltaStateFromBytes(bytes, GetCountFromBytes(new ByteQueue(bytes)));
         }
 
         public static int GetCountFromBytes(ByteQueue bytes)
