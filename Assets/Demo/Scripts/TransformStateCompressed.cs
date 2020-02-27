@@ -50,7 +50,7 @@ public class TransformStateCompressed : StateMB
         public override Type deltaType => typeof(TransformDeltaState);
     }
 
-    public class TransformDeltaState : DeltaState
+    public class TransformDeltaState : CompressedDeltaState
     {
         public override IEnumerable<Type> componentTypes => TransformState.TYPES;
         public override Type stateType => typeof(TransformState);

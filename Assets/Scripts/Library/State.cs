@@ -8,7 +8,7 @@ namespace EntityComponentState
     {
         public int tick;
 
-        public virtual SerializableListEntity entities { get; protected set; } = new SerializableListEntity();
+        public virtual SerializableListEntity entities { get; } = new SerializableListEntity();
         public abstract IEnumerable<Type> componentTypes { get; }
         public abstract Type deltaType { get; }
 
@@ -22,7 +22,7 @@ namespace EntityComponentState
         {
             var state = (State)Activator.CreateInstance(GetType());
             state.tick = tick;
-            state.entities = entities.Clone();
+            state.entities.AddRange(entities.Clone());
             return state;
         }
 
@@ -117,6 +117,6 @@ namespace EntityComponentState
 
     public abstract class CompressedState : State
     {
-        public override SerializableListEntity entities { get; protected set; } = new SerializableListEntityCompressed();
+        public override SerializableListEntity entities { get; } = new SerializableListEntityCompressed();
     }
 }

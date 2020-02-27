@@ -16,6 +16,8 @@ namespace EntityComponentState
         public ByteQueue(uint value) : base() { Enqueue(value); }
         public ByteQueue(float value) : base() { Enqueue(value); }
         public ByteQueue(double value) : base() { Enqueue(value); }
+        public ByteQueue(long value) : base() { Enqueue(value); }
+        public ByteQueue(ulong value) : base() { Enqueue(value); }
         public ByteQueue(string value) : base() { Enqueue(value); }
         public ByteQueue(IToBytes value) : base() { Enqueue(value); }
 
@@ -42,6 +44,8 @@ namespace EntityComponentState
         public uint GetUInt() => BitConverter.ToUInt32(GetBytes(4), 0);
         public float GetFloat() => BitConverter.ToSingle(GetBytes(4), 0);
         public double GetDouble() => BitConverter.ToDouble(GetBytes(8), 0);
+        public long GetLong() => BitConverter.ToInt64(GetBytes(8), 0);
+        public ulong GetULong() => BitConverter.ToUInt64(GetBytes(8), 0);
         
         public string GetString()
         {
@@ -66,6 +70,8 @@ namespace EntityComponentState
         public void Enqueue(uint value) => AddRange(BitConverter.GetBytes(value));
         public void Enqueue(float value) => AddRange(BitConverter.GetBytes(value));
         public void Enqueue(double value) => AddRange(BitConverter.GetBytes(value));
+        public void Enqueue(long value) => AddRange(BitConverter.GetBytes(value));
+        public void Enqueue(ulong value) => AddRange(BitConverter.GetBytes(value));
         public void Enqueue(string value) { AddRange(BitConverter.GetBytes(value.Length)); AddRange(Encoding.UTF8.GetBytes(value)); }
         public void Enqueue(IToBytes value) { AddRange(value.ToBytes()); }
 

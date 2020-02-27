@@ -8,9 +8,9 @@ namespace EntityComponentState
     {
         public int startStateTick;
         public int endStateTick;
-        public int entityCount;
-        public virtual SerializableListEntity spawns { get; protected set; } = new SerializableListEntity();
-        public virtual SerializableListEntity despawns { get; protected set; } = new SerializableListEntity();
+        public virtual LongValue entityCount { get; } = new IntValue();
+        public virtual SerializableListEntity spawns { get; } = new SerializableListEntity();
+        public virtual SerializableListEntity despawns { get; } = new SerializableListEntity();
 
         public abstract IEnumerable<Type> componentTypes { get; }
         public abstract Type stateType { get; }
@@ -34,7 +34,7 @@ namespace EntityComponentState
             Clear();
             startStateTick = startState.tick;
             endStateTick = endState.tick;
-            entityCount = endState.entities.Count;
+            entityCount.value = endState.entities.Count;
 
             var startEntities = startState.entities.Clone();
             var endEntities = endState.entities.Clone();
@@ -68,7 +68,7 @@ namespace EntityComponentState
             var deltaState = (DeltaState)Activator.CreateInstance(GetType());
             deltaState.startStateTick = startStateTick;
             deltaState.endStateTick = endStateTick;
-            deltaState.entityCount = entityCount;
+            deltaState.entityCount.value = entityCount.value;
             deltaState.spawns.AddRange(spawns);
             deltaState.despawns.AddRange(despawns);
             foreach (var componentType in componentTypes)
@@ -80,7 +80,7 @@ namespace EntityComponentState
         {
             startStateTick = 0;
             endStateTick = 0;
-            entityCount = 0;
+            entityCount.value = 0;
             spawns.Clear();
             despawns.Clear();
             foreach (var componentType in componentTypes)
@@ -96,7 +96,7 @@ namespace EntityComponentState
             endState.tick = endStateTick;
             endState.entities.AddRange(startState.entities.Union(spawns).Except(despawns).OrderBy(e => e.id));
             foreach (var componentType in componentTypes)
-                for (var i = 0; i < entityCount; i++)
+                for (var i = 0; i < entityCount.value; i++)
                     if (changes[componentType][i] != null)
                         if (endState.entities[i].HasComponent(componentType))
                             endState.entities[i].GetComponent(componentType).CopyValuesFrom(changes[componentType][i]);
@@ -156,12 +156,12 @@ namespace EntityComponentState
             Clear();
             startStateTick = bytes.GetInt();
             endStateTick = bytes.GetInt();
-            entityCount = bytes.GetInt();
-            spawns = bytes.GetIToBytes<SerializableListEntity>(spawns.GetType());
-            despawns = bytes.GetIToBytes<SerializableListEntity>(despawns.GetType());
+            entityCount.value = bytes.GetIToBytes<LongValue>(entityCount.GetType()).value;
+            spawns.AddRange(bytes.GetIToBytes<SerializableListEntity>(spawns.GetType()));
+            despawns.AddRange(bytes.GetIToBytes<SerializableListEntity>(despawns.GetType()));
 
             foreach (var componentType in componentTypes)
-                for (int i = 0; i < entityCount; i++)
+                for (int i = 0; i < entityCount.value; i++)
                 {
                     var hasChanges = bytes.GetBool();
                     if (hasChanges)
@@ -170,5 +170,15 @@ namespace EntityComponentState
                         changes[componentType].Add(null);
                 }
         }
+    }
+
+    public abstract class CompressedDeltaState : DeltaState
+    {
+        public override LongValue entityCount { get; } = new ByteValue();
+        public override SerializableListEntity spawns { get; } = new SerializableListEntityCompressed();
+        public override SerializableListEntity despawns { get; } = new SerializableListEntityCompressed();
+
+        public CompressedDeltaState() { }
+        public CompressedDeltaState(State startState, State endState) : base(startState, endState) { }
     }
 }
