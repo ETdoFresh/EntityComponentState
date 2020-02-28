@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Profiling;
+using static EntityComponentState.Constants;
 using static TransformStateCompressed;
 
 public class ReadDeltaStateFromStateHistoryFile : MonoBehaviour
@@ -20,7 +20,7 @@ public class ReadDeltaStateFromStateHistoryFile : MonoBehaviour
 
     private void OnEnable()
     {
-        stateHistoryFile = File.Open(WriteDeltaStateHistoryToFile.FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        stateHistoryFile = File.Open(DELTASTATEHISTORY_FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
     }
 
     private void OnDisable()

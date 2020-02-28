@@ -1,19 +1,17 @@
-﻿using EntityComponentState.Unity;
-using System.Collections;
-using System.IO;
+﻿using System.IO;
 using UnityEngine;
+using static EntityComponentState.Constants;
 
 [RequireComponent(typeof(StateMB))]
 public class WriteStateToFile : MonoBehaviour
 {
-    public const string FILE = @"C:\Users\etgarcia\Desktop\EntityComponentState\state.bin";
     public StateMB stateMB;
     private FileStream file;
 
     private void OnEnable()
     {
         if (!stateMB) stateMB = GetComponent<StateMB>();
-        file = File.Open(FILE, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
+        file = File.Open(STATE_FILE, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
         file.SetLength(0);
     }
 

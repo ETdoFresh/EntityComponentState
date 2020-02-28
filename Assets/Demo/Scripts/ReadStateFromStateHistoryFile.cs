@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Profiling;
+using static EntityComponentState.Constants;
 using static TransformStateCompressed;
 
 public class ReadStateFromStateHistoryFile : MonoBehaviour
@@ -21,7 +21,7 @@ public class ReadStateFromStateHistoryFile : MonoBehaviour
 
     private void OnEnable()
     {
-        stateHistoryFile = File.Open(WriteStateHistoryToFile.FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        stateHistoryFile = File.Open(STATEHISTORY_FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
     }
 
     private void OnDisable()

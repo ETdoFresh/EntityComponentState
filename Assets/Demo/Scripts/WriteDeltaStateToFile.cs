@@ -1,18 +1,18 @@
 ﻿using EntityComponentState;
 using System.IO;
 using UnityEngine;
+using static EntityComponentState.Constants;
 
 public class WriteDeltaStateToFile : MonoBehaviour
 {
-    public const string FILE = @"C:\Users\etgarcia\Desktop\EntityComponentState\deltaState.bin";
-    public StateMB aState;
+    public StateMB stateMB;
     public State previousState;
     private FileStream deltaStateFile;
 
     private void OnEnable()
     {
-        if (!aState) aState = GetComponent<StateMB>();
-        deltaStateFile = File.Open(FILE, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
+        if (!stateMB) stateMB = GetComponent<StateMB>();
+        deltaStateFile = File.Open(DELTASTATE_FILE, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
         deltaStateFile.SetLength(0);
     }
 
@@ -23,13 +23,13 @@ public class WriteDeltaStateToFile : MonoBehaviour
 
     private void FixedUpdate()
     {
-        var state = aState.state;
+        var state = stateMB.state;
         try
         {
             if (previousState != null)
             {
                 deltaStateFile.Position = 0;
-                deltaStateFile.Write(aState.deltaState.ToBytes().ToArray(), 0, aState.deltaState.ToBytes().Count);
+                deltaStateFile.Write(stateMB.deltaState.ToBytes().ToArray(), 0, stateMB.deltaState.ToBytes().Count);
             }
         }
         catch

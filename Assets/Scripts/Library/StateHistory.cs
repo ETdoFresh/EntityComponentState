@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using static EntityComponentState.Constants;
 
 namespace EntityComponentState
 {
     public class StateHistory<T> : IToBytes where T : State
     {
-        public static readonly byte[] STATE_DELIMITER = Encoding.UTF8.GetBytes("<EOL>");
-
         public int LatestTick => states.Max(state => state.tick);
         public State LatestState => states.FirstOrDefault(state => state.tick == LatestTick);
 
@@ -38,7 +37,7 @@ namespace EntityComponentState
             var bytes = new ByteQueue();
             for (int i = 0; i < states.Count; i++)
             {
-                if (i > 0) bytes.Enqueue(STATE_DELIMITER);
+                if (i > 0) bytes.Enqueue(DELIMITER);
                 bytes.Enqueue(states[i]);
             }
             return bytes;
@@ -48,9 +47,9 @@ namespace EntityComponentState
         {
             states.Clear();
             states.Add(bytes.GetIToBytes<T>(typeof(T)));
-            while (bytes.StartsWith(STATE_DELIMITER))
+            while (bytes.StartsWith(DELIMITER))
             {
-                bytes.GetBytes(STATE_DELIMITER.Length);
+                bytes.GetBytes(DELIMITER.Length);
                 states.Add(bytes.GetIToBytes<T>(typeof(T)));
             }
         }
@@ -67,12 +66,12 @@ namespace EntityComponentState
             while (bytes.Count > 0)
             {
 
-                if (bytes.StartsWith(STATE_DELIMITER))
+                if (bytes.StartsWith(DELIMITER))
                     currentTick++;
 
                 if (currentTick == tick)
                 {
-                    bytes.GetBytes(STATE_DELIMITER.Length);
+                    bytes.GetBytes(DELIMITER.Length);
                     return bytes.GetIToBytes<State>(type);
                 }
 
@@ -94,7 +93,7 @@ namespace EntityComponentState
             var count = 1;
             while (bytes.Count > 0)
             {
-                if (bytes.StartsWith(STATE_DELIMITER))
+                if (bytes.StartsWith(DELIMITER))
                     count++;
 
                 bytes.GetByte();

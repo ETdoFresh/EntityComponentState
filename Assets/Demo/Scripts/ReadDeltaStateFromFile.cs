@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using static EntityComponentState.Constants;
 
 [RequireComponent(typeof(StateMB))]
 public class ReadDeltaStateFromFile : MonoBehaviour
@@ -18,12 +19,12 @@ public class ReadDeltaStateFromFile : MonoBehaviour
     private void OnEnable()
     {
         if (!stateMB) stateMB = GetComponent<StateMB>();
-        stateFile = File.Open(WriteStateToFile.FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        stateFile = File.Open(STATE_FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         var bytes = new byte[stateFile.Length];
         stateFile.Position = 0;
         stateFile.Read(bytes, 0, (int)stateFile.Length);
         stateMB.state.FromBytes(new ByteQueue(bytes));
-        deltaStateFile = File.Open(WriteDeltaStateToFile.FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        deltaStateFile = File.Open(DELTASTATE_FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
     }
 
     private void OnDisable()

@@ -1,10 +1,10 @@
 ﻿using EntityComponentState;
 using System.IO;
 using UnityEngine;
+using static EntityComponentState.Constants;
 
 public class WriteDeltaStateHistoryToFile : MonoBehaviour
 {
-    public const string FILE = @"C:\Users\etgarcia\Desktop\EntityComponentState\deltaStateHistory.bin";
     public StateHistoryMB stateHistoryMB;
     public State previousState;
     private FileStream deltaStateHistoryFile;
@@ -12,7 +12,7 @@ public class WriteDeltaStateHistoryToFile : MonoBehaviour
     private void OnEnable()
     {
         if (!stateHistoryMB) stateHistoryMB = GetComponent<StateHistoryMB>();
-        deltaStateHistoryFile = File.Open(FILE, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
+        deltaStateHistoryFile = File.Open(DELTASTATEHISTORY_FILE, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
         deltaStateHistoryFile.SetLength(0);
     }
 
@@ -26,7 +26,7 @@ public class WriteDeltaStateHistoryToFile : MonoBehaviour
         try
         {
             if (deltaStateHistoryFile.Length > 0)
-                deltaStateHistoryFile.Write(DeltaStateHistory<DeltaState>.STATE_DELIMITER, 0, DeltaStateHistory<DeltaState>.STATE_DELIMITER.Length);
+                deltaStateHistoryFile.Write(DELIMITER, 0, DELIMITER.Length);
 
             var latestDeltaState = stateHistoryMB.deltaStateHistory.LatestDeltaState;
             if (latestDeltaState.startStateTick != latestDeltaState.endStateTick)

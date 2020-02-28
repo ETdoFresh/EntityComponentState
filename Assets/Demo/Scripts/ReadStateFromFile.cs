@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using static EntityComponentState.Constants;
 
 [RequireComponent(typeof(StateMB))]
 public class ReadStateFromFile : MonoBehaviour
@@ -16,7 +17,7 @@ public class ReadStateFromFile : MonoBehaviour
     private void OnEnable()
     {
         if (!stateMB) stateMB = GetComponent<StateMB>();
-        file = File.Open(WriteStateToFile.FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        file = File.Open(STATE_FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
     }
 
     private void OnDisable()

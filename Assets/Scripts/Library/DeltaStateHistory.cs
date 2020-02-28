@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using static EntityComponentState.Constants;
 
 namespace EntityComponentState
 {
     public class DeltaStateHistory<T> : IToBytes where T : DeltaState
     {
-        public static readonly byte[] STATE_DELIMITER = Encoding.UTF8.GetBytes("<EOL>");
-
         public int LatestTick => deltaStates.Max(d => d.endStateTick);
         public DeltaState LatestDeltaState => deltaStates.FirstOrDefault(d => d.endStateTick == LatestTick);
 
@@ -38,7 +37,7 @@ namespace EntityComponentState
             var bytes = new ByteQueue();
             for (int i = 0; i < deltaStates.Count; i++)
             {
-                if (i > 0) bytes.Enqueue(STATE_DELIMITER);
+                if (i > 0) bytes.Enqueue(DELIMITER);
                 bytes.Enqueue(deltaStates[i]);
             }
             return bytes;
@@ -48,9 +47,9 @@ namespace EntityComponentState
         {
             deltaStates.Clear();
             deltaStates.Add(bytes.GetIToBytes<T>(typeof(T)));
-            while (bytes.StartsWith(STATE_DELIMITER))
+            while (bytes.StartsWith(DELIMITER))
             {
-                bytes.GetBytes(STATE_DELIMITER.Length);
+                bytes.GetBytes(DELIMITER.Length);
                 deltaStates.Add(bytes.GetIToBytes<T>(typeof(T)));
             }
         }
@@ -66,12 +65,12 @@ namespace EntityComponentState
             var currentTick = 0;
             while (bytes.Count > 0)
             {
-                if (bytes.StartsWith(STATE_DELIMITER))
+                if (bytes.StartsWith(DELIMITER))
                     currentTick++;
 
                 if (currentTick == startStateTick)
                 {
-                    bytes.GetBytes(STATE_DELIMITER.Length);
+                    bytes.GetBytes(DELIMITER.Length);
                     return bytes.GetIToBytes<DeltaState>(type);
                 }
 
@@ -93,7 +92,7 @@ namespace EntityComponentState
             var count = 1;
             while (bytes.Count > 0)
             {
-                if (bytes.StartsWith(STATE_DELIMITER))
+                if (bytes.StartsWith(DELIMITER))
                     count++;
 
                 bytes.GetByte();
