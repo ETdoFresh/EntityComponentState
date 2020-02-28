@@ -11,5 +11,6 @@ namespace EntityComponentState
         public const string DELTASTATE_FILE = @"C:\Users\etgarcia\Desktop\EntityComponentState\deltaState.bin";
         public const string STATEHISTORY_FILE = @"C:\Users\etgarcia\Desktop\EntityComponentState\stateHistory.bin";
         public const string DELTASTATEHISTORY_FILE = @"C:\Users\etgarcia\Desktop\EntityComponentState\deltaStateHistory.bin";
+        public const string TICK_FILE = @"C:\Users\etgarcia\Desktop\EntityComponentState\tick.bin";
     }
 }
