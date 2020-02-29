@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
 using static EntityComponentState.Constants;
 
 namespace EntityComponentState
 {
     public class DeltaStateHistory<T> : IToBytes where T : DeltaState
     {
-        public int LatestTick => deltaStates.Max(d => d.endStateTick);
-        public DeltaState LatestDeltaState => deltaStates.FirstOrDefault(d => d.endStateTick == LatestTick);
-
         protected SerializableList<T> deltaStates = new SerializableList<T>();
+        
+        public int LatestTick => deltaStates.Max(d => d.endStateTick);
+        public T LatestDeltaState => deltaStates.FirstOrDefault(d => d.endStateTick == LatestTick);
+        public int Count => deltaStates.Count;
+        public T this[int index] => deltaStates[index];
 
         public void Add(T deltaState)
         {

@@ -7,10 +7,12 @@ namespace EntityComponentState
 {
     public class StateHistory<T> : IToBytes where T : State
     {
-        public int LatestTick => states.Max(state => state.tick);
-        public State LatestState => states.FirstOrDefault(state => state.tick == LatestTick);
-
         protected SerializableList<T> states = new SerializableList<T>();
+
+        public int LatestTick => states.Max(state => state.tick);
+        public T LatestState => states.FirstOrDefault(state => state.tick == LatestTick);
+        public int Count => states.Count; 
+        public T this[int index] => states[index];
 
         public void Add(T state)
         {
