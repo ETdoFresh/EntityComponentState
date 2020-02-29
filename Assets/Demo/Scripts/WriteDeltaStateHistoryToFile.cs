@@ -1,42 +1,38 @@
 ﻿using EntityComponentState;
-using System.IO;
 using UnityEngine;
-using static EntityComponentState.Constants;
 
 public class WriteDeltaStateHistoryToFile : MonoBehaviour
 {
     public StateHistoryMB stateHistoryMB;
     public State previousState;
-    private FileStream deltaStateHistoryFile;
+
+    private string Path => Constants.DELTASTATEHISTORY_FILE;
+
+    private void OnValidate()
+    {
+        if (!stateHistoryMB) stateHistoryMB = GetComponent<StateHistoryMB>();
+    }
 
     private void OnEnable()
     {
-        if (!stateHistoryMB) stateHistoryMB = GetComponent<StateHistoryMB>();
-        deltaStateHistoryFile = File.Open(DELTASTATEHISTORY_FILE, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
-        deltaStateHistoryFile.SetLength(0);
+        StateFile.OpenAndResetForWrite(Path);
     }
 
     private void OnDisable()
     {
-        deltaStateHistoryFile.Close();
+        StateFile.Close(Path);
     }
 
     private void FixedUpdate()
     {
-        try
-        {
-            if (deltaStateHistoryFile.Length > 0)
-                deltaStateHistoryFile.Write(DELIMITER, 0, DELIMITER.Length);
+        if (!StateFile.IsEmpty(Path))
+            StateFile.Write(Path, Constants.DELIMITER);
 
-            var latestDeltaState = stateHistoryMB.deltaStateHistory.LatestDeltaState;
-            if (latestDeltaState.startStateTick != latestDeltaState.endStateTick)
-            {
-                var latestDeltaStateBytes = latestDeltaState.ToBytes().ToArray();
-                deltaStateHistoryFile.Write(latestDeltaStateBytes, 0, latestDeltaStateBytes.Length);
-            }
-        }
-        catch
+        var latestDeltaState = stateHistoryMB.deltaStateHistory.LatestDeltaState;
+        if (latestDeltaState.startStateTick != latestDeltaState.endStateTick)
         {
+            var bytes = latestDeltaState.ToBytes().ToArray();
+            StateFile.Write(Path, bytes);
         }
     }
 }

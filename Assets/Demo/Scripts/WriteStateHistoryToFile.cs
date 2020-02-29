@@ -1,38 +1,35 @@
 ﻿using EntityComponentState;
 using System.IO;
 using UnityEngine;
-using static EntityComponentState.Constants;
 
 public class WriteStateHistoryToFile : MonoBehaviour
 {
     public StateHistoryMB stateHistoryMB;
     public State previousState;
-    private FileStream stateHistoryFile;
+
+    private string Path => Constants.STATEHISTORY_FILE;
+
+    private void OnValidate()
+    {
+        if (!stateHistoryMB) stateHistoryMB = GetComponent<StateHistoryMB>();
+    }
 
     private void OnEnable()
     {
-        if (!stateHistoryMB) stateHistoryMB = GetComponent<StateHistoryMB>();
-        stateHistoryFile = File.Open(STATEHISTORY_FILE, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
-        stateHistoryFile.SetLength(0);
+        StateFile.OpenAndResetForWrite(Path);
     }
 
     private void OnDisable()
     {
-        stateHistoryFile.Close();
+        StateFile.Close(Path);
     }
 
     private void FixedUpdate()
     {
-        try
-        {
-            if (stateHistoryFile.Length > 0)
-                stateHistoryFile.Write(DELIMITER, 0, DELIMITER.Length);
+        if (!StateFile.IsEmpty(Path))
+            StateFile.Write(Path, Constants.DELIMITER);
 
-            var latestState = stateHistoryMB.stateHistory.LatestState.ToBytes().ToArray();
-            stateHistoryFile.Write(latestState, 0, latestState.Length);
-        }
-        catch
-        {
-        }
+        var bytes = stateHistoryMB.stateHistory.LatestState.ToBytes().ToArray();
+        StateFile.Write(Path, bytes);
     }
 }

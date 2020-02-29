@@ -1,17 +1,20 @@
 ﻿using EntityComponentState;
-using System.IO;
+using EntityComponentState.Unity;
+using System.Collections.Generic;
 using UnityEngine;
-using static EntityComponentState.Constants;
 using static TransformStateCompressed;
 
 [RequireComponent(typeof(StateMB))]
 public class ReadDeltaStateOnTick : MonoBehaviour
 {
+    public int currentTick = -1;
     public StateMB stateMB;
+    public TransformState state = new TransformState();
+    public List<StateClone> clones = new List<StateClone>(); 
     public DeltaStateHistory<TransformDeltaState> deltaStateHistory = new DeltaStateHistory<TransformDeltaState>();
-    private FileStream tickFile;
 
-    public float simulationUpdatesPerSecond => 1f / SIMULATION_RATE;
+    public float simulationUpdatesPerSecond => 1f / Constants.SIMULATION_RATE;
+    private string Path => Constants.TICK_FILE;
 
     private void OnValidate()
     {
@@ -21,7 +24,6 @@ public class ReadDeltaStateOnTick : MonoBehaviour
     private void OnEnable()
     {
         Time.fixedDeltaTime = simulationUpdatesPerSecond;
-        tickFile = File.Open(TICK_FILE, FileMode.OpenOrCreate, FileAccess.Read, FileShare.ReadWrite);
     }
 
     private void FixedUpdate()
@@ -29,11 +31,17 @@ public class ReadDeltaStateOnTick : MonoBehaviour
         if (Input.GetButtonDown("Jump"))
         //if (stateMB.state.tick > 0 && stateMB.state.tick % TICK_RATE == 0)
         {
-            var bytes = new byte[tickFile.Length];
-            tickFile.Read(bytes, 0, bytes.Length);
+            var bytes = StateFile.ReadBytes(Path);
             deltaStateHistory.FromBytes(new ByteQueue(bytes));
-            var deltaState = deltaStateHistory.LatestDeltaState;
-
+            currentTick = Mathf.Min(currentTick + 1, deltaStateHistory.LatestTick);
+            var deltaState = deltaStateHistory.GetDeltaState(currentTick);
+            if (deltaState != null)
+            {
+                state = (TransformState)deltaState.GenerateEndState(state);
+                StateToScene.SpawnEntities(state, clones, transform);
+                StateToScene.DespawnEntities(state, clones);
+                StateToScene.ApplyChangesToEntites(state, clones);
+            }
         }
     }
 }

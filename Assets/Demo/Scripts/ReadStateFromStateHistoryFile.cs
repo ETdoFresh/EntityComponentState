@@ -2,9 +2,7 @@
 using EntityComponentState.Unity;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UnityEngine;
-using static EntityComponentState.Constants;
 using static TransformStateCompressed;
 
 public class ReadStateFromStateHistoryFile : MonoBehaviour
@@ -16,99 +14,40 @@ public class ReadStateFromStateHistoryFile : MonoBehaviour
     private FileStream stateHistoryFile;
     public bool isPlaying = true;
     public bool isLive = false;
-    public byte[] bytes = new byte[0];
     public StateHistory<TransformState> stateHistory = new StateHistory<TransformState>();
 
-    private void OnEnable()
-    {
-        stateHistoryFile = File.Open(STATEHISTORY_FILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-    }
+    private string Path => Constants.STATEHISTORY_FILE;
 
     private void OnDisable()
     {
-        stateHistoryFile.Close();
+        StateFile.Close(Path);
     }
 
     private void FixedUpdate()
     {
-        try
+        if (StateFile.HasChanged(Path))
         {
-            if (bytes.Length != stateHistoryFile.Length)
-            {
-                bytes = new byte[stateHistoryFile.Length];
-                stateHistoryFile.Position = 0;
-                stateHistoryFile.Read(bytes, 0, (int)stateHistoryFile.Length);
-                stateHistory.FromBytes(new ByteQueue(bytes));
-                count = stateHistory.LatestTick;
-            }
+            var bytes = StateFile.ReadBytes(Path);
+            stateHistory.FromBytes(new ByteQueue(bytes));
+            count = stateHistory.LatestTick;
+        }
 
-            if (count > 0)
+        if (count > 0)
+        {
+            if (isLive && isPlaying)
+                countPosition = count - 1;
+            else
+                countPosition = Math.Min(countPosition, count - 1);
+            state = stateHistory.GetState(countPosition);
+            if (state != null)
             {
-                if (isLive && isPlaying)
-                    countPosition = count - 1;
-                else
-                    countPosition = Math.Min(countPosition, count - 1);
-                state = stateHistory.GetState(countPosition);
-                SpawnEntities();
-                DespawnEntities();
-                ApplyChangesToEntites();
+                StateToScene.SpawnEntities(state, clones, transform);
+                StateToScene.DespawnEntities(state, clones);
+                StateToScene.ApplyChangesToEntites(state, clones);
             }
         }
-        catch
-        {
-        }
+
         if (isPlaying)
             countPosition++;
-    }
-
-    private void SpawnEntities()
-    {
-        var spawns = state.entities.Where(entity => !clones.Any(clone => clone.entityId == entity.id));
-        foreach (var spawn in spawns)
-        {
-            GameObject newGameObject = null;
-            if (spawn.HasComponent<Primitive>())
-            {
-                var primitive = spawn.GetComponent<Primitive>();
-                if (primitive.primitiveType == Primitive.PrimitiveType.Capsule)
-                    newGameObject = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                else if (primitive.primitiveType == Primitive.PrimitiveType.Cube)
-                    newGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                else if (primitive.primitiveType == Primitive.PrimitiveType.Cylinder)
-                    newGameObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                else if (primitive.primitiveType == Primitive.PrimitiveType.Plane)
-                    newGameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
-                else if (primitive.primitiveType == Primitive.PrimitiveType.Quad)
-                    newGameObject = GameObject.CreatePrimitive(PrimitiveType.Quad);
-                else if (primitive.primitiveType == Primitive.PrimitiveType.Sphere)
-                    newGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            }
-            if (!newGameObject)
-                newGameObject = new GameObject();
-
-            newGameObject.transform.SetParent(transform);
-            newGameObject.layer = LayerMask.NameToLayer("AnotherPhysicsWorld");
-            clones.Add(new StateClone { gameObject = newGameObject, entityId = spawn.id });
-        }
-    }
-
-    private void DespawnEntities()
-    {
-        var despawns = clones.Where(clone => !state.entities.Any(entity => clone.entityId == entity.id));
-        foreach (var despawn in despawns)
-        {
-            clones.Remove(despawn);
-            Destroy(despawn.gameObject);
-        }
-    }
-
-    private void ApplyChangesToEntites()
-    {
-        foreach (var entity in state.entities)
-        {
-            var clone = clones.First(c => c.entityId == entity.id);
-            foreach (var component in entity.components)
-                component.Apply(clone.gameObject);
-        }
     }
 }
