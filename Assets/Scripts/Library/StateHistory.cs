@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
 using static EntityComponentState.Constants;
 
 namespace EntityComponentState
@@ -9,8 +8,6 @@ namespace EntityComponentState
     {
         protected SerializableList<T> states = new SerializableList<T>();
 
-        public int LatestTick => states.Max(state => state.tick);
-        public T LatestState => states.FirstOrDefault(state => state.tick == LatestTick);
         public int Count => states.Count; 
         public T this[int index] => states[index];
 

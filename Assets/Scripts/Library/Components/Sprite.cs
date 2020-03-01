@@ -53,5 +53,10 @@ namespace EntityComponentState
         {
             return $"[{entity.id}][{spriteName}][{GetType().Name}]";
         }
+
+        public override Component Lerp(Component endComponent, float t)
+        {
+            return t < 1 ? this : endComponent;
+        }
     }
 }

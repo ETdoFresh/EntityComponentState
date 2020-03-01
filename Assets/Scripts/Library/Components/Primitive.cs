@@ -66,5 +66,10 @@
         {
             return primitiveType.GetHashCode();
         }
+
+        public override Component Lerp(Component endComponent, float t)
+        {
+            return t < 1 ? this : endComponent;
+        }
     }
 }

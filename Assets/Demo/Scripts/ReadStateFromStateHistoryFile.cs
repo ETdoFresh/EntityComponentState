@@ -29,7 +29,7 @@ public class ReadStateFromStateHistoryFile : MonoBehaviour
         {
             var bytes = StateFile.ReadBytes(Path);
             stateHistory.FromBytes(new ByteQueue(bytes));
-            count = stateHistory.LatestTick;
+            count = stateHistory.Count;
         }
 
         if (count > 0)

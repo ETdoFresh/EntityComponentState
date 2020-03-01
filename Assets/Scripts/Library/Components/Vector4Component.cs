@@ -110,5 +110,23 @@ namespace EntityComponentState
             Z = byteQueue.GetFloat();
             W = byteQueue.GetFloat();
         }
+
+        public override Component Lerp(Component endComponent, float t)
+        {
+            var start = this;
+            var end = (Vector4Component)endComponent;
+            if (start.value == end.value) return this;
+
+            var rangeX = end.X - X;
+            var rangeY = end.Y - Y;
+            var rangeZ = end.Z - Z;
+            var rangeW = end.W - W;
+            var lerp = (Vector4Component)Clone();
+            lerp.X += rangeX * t;
+            lerp.Y += rangeY * t;
+            lerp.Z += rangeZ * t;
+            lerp.W += rangeW * t;
+            return lerp;
+        }
     }
 }

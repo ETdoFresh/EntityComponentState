@@ -53,5 +53,15 @@ namespace EntityComponentState
         {
             return $"[{entity.id}][{frame}][{GetType().Name}]";
         }
+
+        public override Component Lerp(Component endComponent, float t)
+        {
+            var start = this;
+            var end = (AnimationFrame)endComponent;
+            var range = end.frame - start.frame;
+            var lerp = (AnimationFrame)Clone();
+            lerp.frame += Math.RoundToInt(t * range);
+            return lerp;
+        }
     }
 }

@@ -113,6 +113,30 @@ namespace EntityComponentState
         {
             return tick.GetHashCode();
         }
+
+        public static State Lerp(State startState, State endState, float t)
+        {
+            var newState = startState.Clone();
+            var startStateEntities = newState.entities.Union(endState.entities);
+            var endStateEntities = endState.entities.Union(startState.entities);
+            foreach (var newStateEntity in newState.entities)
+            {
+                var endStateEntity = endStateEntities.Where(e => e == newStateEntity).FirstOrDefault();
+                if (endStateEntity != null)
+                {
+                    var startStateEntity = startStateEntities.Where(e => e == newStateEntity).FirstOrDefault();
+                    foreach (var newStateComponent in newStateEntity.components)
+                    {
+                        var type = newStateComponent.GetType();
+                        var startStateComponent = startStateEntity.GetComponent(type);
+                        var endStateComponent = endStateEntity.GetComponent(type);
+                        if (endStateComponent != null)
+                            newStateComponent.CopyValuesFrom(Component.Lerp(startStateComponent, endStateComponent, t));
+                    }
+                }
+            }
+            return newState;
+        }
     }
 
     public abstract class CompressedState : State

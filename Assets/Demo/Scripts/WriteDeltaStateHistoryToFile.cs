@@ -1,6 +1,7 @@
 ﻿using EntityComponentState;
 using UnityEngine;
 
+[RequireComponent(typeof(StateHistoryMB))]
 public class WriteDeltaStateHistoryToFile : MonoBehaviour
 {
     public StateHistoryMB stateHistoryMB;
@@ -28,11 +29,15 @@ public class WriteDeltaStateHistoryToFile : MonoBehaviour
         if (!StateFile.IsEmpty(Path))
             StateFile.Write(Path, Constants.DELIMITER);
 
-        var latestDeltaState = stateHistoryMB.deltaStateHistory.LatestDeltaState;
-        if (latestDeltaState.startStateTick != latestDeltaState.endStateTick)
+        var history = stateHistoryMB.deltaStateHistory;
+        if (history.Count > 0)
         {
-            var bytes = latestDeltaState.ToBytes().ToArray();
-            StateFile.Write(Path, bytes);
+            var latestDeltaState = stateHistoryMB.deltaStateHistory[history.Count - 1];
+            if (latestDeltaState.startStateTick != latestDeltaState.endStateTick)
+            {
+                var bytes = latestDeltaState.ToBytes().ToArray();
+                StateFile.Write(Path, bytes);
+            }
         }
     }
 }

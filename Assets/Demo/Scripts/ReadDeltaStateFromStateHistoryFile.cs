@@ -27,7 +27,7 @@ public class ReadDeltaStateFromStateHistoryFile : MonoBehaviour
         {
             var bytes = StateFile.ReadBytes(Path);
             deltaStateHistory.FromBytes(new ByteQueue(bytes));
-            count = deltaStateHistory.LatestTick;
+            count = deltaStateHistory.Count;
         }
         if (count > 0 && isPlaying)
         {

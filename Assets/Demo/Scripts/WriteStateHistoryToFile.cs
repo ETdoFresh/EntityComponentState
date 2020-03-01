@@ -1,7 +1,7 @@
 ﻿using EntityComponentState;
-using System.IO;
 using UnityEngine;
 
+[RequireComponent(typeof(StateHistoryMB))]
 public class WriteStateHistoryToFile : MonoBehaviour
 {
     public StateHistoryMB stateHistoryMB;
@@ -29,7 +29,11 @@ public class WriteStateHistoryToFile : MonoBehaviour
         if (!StateFile.IsEmpty(Path))
             StateFile.Write(Path, Constants.DELIMITER);
 
-        var bytes = stateHistoryMB.stateHistory.LatestState.ToBytes().ToArray();
-        StateFile.Write(Path, bytes);
+        var history = stateHistoryMB.stateHistory;
+        if (history.Count > 0)
+        {
+            var bytes = stateHistoryMB.stateHistory[history.Count - 1].ToBytes().ToArray();
+            StateFile.Write(Path, bytes);
+        }
     }
 }

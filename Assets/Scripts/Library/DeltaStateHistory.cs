@@ -8,8 +8,6 @@ namespace EntityComponentState
     {
         protected SerializableList<T> deltaStates = new SerializableList<T>();
         
-        public int LatestTick => deltaStates.Max(d => d.endStateTick);
-        public T LatestDeltaState => deltaStates.FirstOrDefault(d => d.endStateTick == LatestTick);
         public int Count => deltaStates.Count;
         public T this[int index] => deltaStates[index];
 

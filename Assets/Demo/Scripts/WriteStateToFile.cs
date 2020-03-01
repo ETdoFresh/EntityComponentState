@@ -8,7 +8,7 @@ public class WriteStateToFile : MonoBehaviour
 
     private string Path => Constants.STATE_FILE;
 
-    private void OnEnable()
+    private void OnValidate()
     {
         if (!stateMB) stateMB = GetComponent<StateMB>();
     }

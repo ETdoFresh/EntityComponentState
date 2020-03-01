@@ -13,6 +13,8 @@ public class WriteDeltaStateOnTick : MonoBehaviour
     public float SimulationUpdatesPerSecond => 1f / Constants.SIMULATION_RATE;
     private string Path => Constants.TICK_FILE;
 
+    public float time;
+
     private void OnValidate()
     {
         if (!stateMB) stateMB = GetComponent<StateMB>();
@@ -26,6 +28,7 @@ public class WriteDeltaStateOnTick : MonoBehaviour
 
     private void FixedUpdate()
     {
+        time = Time.time;
         if (stateMB.state.tick > 0 && stateMB.state.tick % Constants.TICK_RATE == 0)
         {
             var deltaState = new TransformDeltaState(previousState, stateMB.state);

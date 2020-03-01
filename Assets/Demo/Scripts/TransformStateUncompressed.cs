@@ -13,9 +13,11 @@ public class TransformStateUncompressed : StateMB
     [TextArea(2, 20)] public string stateString;
     [TextArea(2, 20)] public string stateBytes;
 
-    private void Update()
+    private void FixedUpdate()
     {
-        state.tick++;
+        if (Time.time > 0)
+            state.tick++;
+
         state.entities.Clear();
         state.entities.AddRange(FindObjectsOfType<EntityMB>().Select(e => e.entity));
         stateString = state.ToString();

@@ -19,13 +19,19 @@ public class TransformStateCompressed : StateMB
 
     private void FixedUpdate()
     {
-        state.tick++;
-        state.entities.Clear();
-        state.entities.AddRange(FindObjectsOfType<EntityMB>().Select(e => e.entity).OrderBy(e => e.id));
+        if (Time.time > 0)
+        {
+            state.tick++;
+            state.entities.Clear();
+            state.entities.AddRange(FindObjectsOfType<EntityMB>().Select(e => e.entity).OrderBy(e => e.id));
+        }
         stateString = state.ToString();
         stateBytes = $"{state.ToBytes().ToHexString()} [{state.ToBytes().Count}]";
 
-        deltaState.Create(previousState, state);
+        if (state.tick > 0)
+        {
+            deltaState.Create(previousState, state);
+        }
         deltaStateString = deltaState.ToString();
         var deltaStateBytes = deltaState.ToBytes();
         this.deltaStateBytes = $"{deltaStateBytes.ToHexString()} [{deltaStateBytes.Count}]";
@@ -45,7 +51,7 @@ public class TransformStateCompressed : StateMB
             typeof(Name),
             typeof(Primitive)
         };
-        
+
         public override IEnumerable<Type> componentTypes => TYPES;
         public override Type deltaType => typeof(TransformDeltaState);
     }
@@ -54,7 +60,7 @@ public class TransformStateCompressed : StateMB
     {
         public override IEnumerable<Type> componentTypes => TransformState.TYPES;
         public override Type stateType => typeof(TransformState);
-        
+
         public TransformDeltaState() { }
         public TransformDeltaState(State startState, State endState) : base(startState, endState) { }
     }

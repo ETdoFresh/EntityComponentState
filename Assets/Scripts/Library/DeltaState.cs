@@ -94,7 +94,7 @@ namespace EntityComponentState
 
             var endState = (State)Activator.CreateInstance(startState.GetType());
             endState.tick = endStateTick;
-            endState.entities.AddRange(startState.entities.Union(spawns).Except(despawns).OrderBy(e => e.id));
+            endState.entities.AddRange(startState.entities.Clone().Union(spawns).Except(despawns).OrderBy(e => e.id));
             foreach (var componentType in componentTypes)
                 for (var i = 0; i < entityCount.value; i++)
                     if (changes[componentType][i] != null)

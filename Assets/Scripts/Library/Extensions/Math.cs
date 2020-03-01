@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using MathSys = System.Math;
 
 namespace EntityComponentState
@@ -38,5 +36,7 @@ namespace EntityComponentState
         }
 
         public static int Min(int val1, int val2) => MathSys.Min(val1, val2);
+
+        public static int RoundToInt(float value) => (int)MathSys.Round(value);
     }
 }

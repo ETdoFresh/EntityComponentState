@@ -63,5 +63,12 @@ namespace EntityComponentState
         public abstract byte[] ToCompressedBytes();
 
         public abstract void CopyValuesFrom(Component component);
+
+        public abstract Component Lerp(Component endComponent, float t);
+
+        public static Component Lerp(Component startComponent, Component endComponent, float t)
+        {
+            return startComponent.Lerp(endComponent, t);
+        }
     }
 }
