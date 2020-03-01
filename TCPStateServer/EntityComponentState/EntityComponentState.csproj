@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\Assets\Scripts\Library\Components\AngularVelocity.cs" Link="Components\AngularVelocity.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Components\AnimationFrame.cs" Link="Components\AnimationFrame.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Components\Component.cs" Link="Components\Component.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Components\CompressedAngularVelocity.cs" Link="Components\CompressedAngularVelocity.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Components\CompressedPosition.cs" Link="Components\CompressedPosition.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Components\CompressedRotation.cs" Link="Components\CompressedRotation.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Components\CompressedScale.cs" Link="Components\CompressedScale.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Components\CompressedVelocity.cs" Link="Components\CompressedVelocity.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Components\Name.cs" Link="Components\Name.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Components\Position.cs" Link="Components\Position.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Components\Primitive.cs" Link="Components\Primitive.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Components\Rotation.cs" Link="Components\Rotation.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Components\Scale.cs" Link="Components\Scale.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Components\Sprite.cs" Link="Components\Sprite.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Components\Vector3Component.cs" Link="Components\Vector3Component.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Components\Vector4Component.cs" Link="Components\Vector4Component.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Components\Velocity.cs" Link="Components\Velocity.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\DataStructures\ByteQueue.cs" Link="DataStructures\ByteQueue.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\DataStructures\ComponentTypes.cs" Link="DataStructures\ComponentTypes.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\DataStructures\Constants.cs" Link="DataStructures\Constants.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\DataStructures\Entity.cs" Link="DataStructures\Entity.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\DataStructures\IDAssignment.cs" Link="DataStructures\IDAssignment.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\DataStructures\IToBytes.cs" Link="DataStructures\IToBytes.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\DataStructures\LongValue.cs" Link="DataStructures\LongValue.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\DataStructures\SerializableList.cs" Link="DataStructures\SerializableList.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\DeltaState.cs" Link="DeltaState.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\DeltaStateHistory.cs" Link="DeltaStateHistory.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Extensions\ByteArrayExtension.cs" Link="Extensions\ByteArrayExtension.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Extensions\Compression.cs" Link="Extensions\Compression.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Extensions\Math.cs" Link="Extensions\Math.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\State.cs" Link="State.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\StateHistory.cs" Link="StateHistory.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Structs\Vector2.cs" Link="Structs\Vector2.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Structs\Vector3.cs" Link="Structs\Vector3.cs" />
+    <Compile Include="..\..\Assets\Scripts\Library\Structs\Vector4.cs" Link="Structs\Vector4.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Components\" />
+    <Folder Include="DataStructures\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Structs\" />
+  </ItemGroup>
+
+</Project>
