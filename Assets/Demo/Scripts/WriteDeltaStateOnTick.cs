@@ -31,7 +31,8 @@ public class WriteDeltaStateOnTick : MonoBehaviour
         time = Time.time;
         if (stateMB.state.tick > 0 && stateMB.state.tick % Constants.TICK_RATE == 0)
         {
-            var deltaState = new TransformDeltaState(previousState, stateMB.state);
+            var deltaState = new TransformDeltaState();
+            deltaState.Create(previousState, stateMB.state);
             deltaStateHistory.Add(deltaState);
 
             if (!StateFile.IsEmpty(Path))

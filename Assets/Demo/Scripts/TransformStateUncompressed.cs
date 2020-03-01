@@ -40,8 +40,5 @@ public class TransformStateUncompressed : StateMB
     public class TransformDeltaState : DeltaState
     {
         public override IEnumerable<Type> componentTypes => TransformState.TYPES;
-
-        public TransformDeltaState() { }
-        public TransformDeltaState(State startState, State endState) : base(startState, endState) { }
     }
 }

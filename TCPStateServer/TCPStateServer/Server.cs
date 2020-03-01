@@ -1,9 +1,10 @@
-﻿using System;
+﻿using CSharpNetworking;
+using EntityComponentState;
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
-using CSharpNetworking;
-using EntityComponentState;
+using TransformStateLibrary;
 
 namespace TCPStateServer
 {
@@ -14,7 +15,7 @@ namespace TCPStateServer
 
         static void Main(string[] args)
         {
-            var state = new TransformState();
+            var stateHistory = new StateHistory<TransformState>();
             var port = 9999;
             server = new TCPServer("localhost", 9999);
             server.OnOpen += OnClientConnected;
@@ -40,22 +41,9 @@ namespace TCPStateServer
 
         private static void OnReceiveMessage(object sender, Message<Socket> e)
         {
-            Console.WriteLine($"TCPClient {e.client.Handle}: {e.data}");
-            server.Send(e.client, $"TCPServer: ECHO -- {e.data}");
+            var state = new TransformState();
+            state.FromBytes(new ByteQueue(e.bytes));
+            Console.WriteLine($"TCPClient {e.client.Handle}: {state}");
         }
-    }
-
-    public class TransformState : State
-    {
-        private static readonly Type[] TYPES = new[]
-        {
-            typeof(CompressedPosition),
-            typeof(CompressedRotation),
-            typeof(CompressedScale),
-            typeof(Name),
-            typeof(Primitive)
-        };
-
-        public override IEnumerable<Type> componentTypes { get; } = TYPES;
     }
 }

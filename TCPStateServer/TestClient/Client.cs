@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using EntityComponentState;
+using TransformStateLibrary;
 
 namespace TestClient
 {
@@ -19,9 +21,10 @@ namespace TestClient
             client.Open();
 
             string input;
-            while((input = Console.ReadLine()).ToLower() != "quit")
+            var state = new TransformState();
+            while ((input = Console.ReadLine()).ToLower() != "quit")
             {
-                client.Send(input);
+                client.Send(state.ToBytes().ToArray());
             }
             client.Close();
         }

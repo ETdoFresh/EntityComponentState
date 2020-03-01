@@ -21,13 +21,6 @@ namespace EntityComponentState
                 changes.Add(componentType, new List<Component>());
         }
 
-        public DeltaState(State startState, State endState)
-        {
-            foreach (var componentType in componentTypes)
-                changes.Add(componentType, new List<Component>());
-            Create(startState, endState);
-        }
-
         public void Create(State startState, State endState)
         {
             Clear();
@@ -176,8 +169,5 @@ namespace EntityComponentState
         public override LongValue entityCount { get; } = new ByteValue();
         public override SerializableListEntity spawns { get; } = new SerializableListEntityCompressed();
         public override SerializableListEntity despawns { get; } = new SerializableListEntityCompressed();
-
-        public CompressedDeltaState() { }
-        public CompressedDeltaState(State startState, State endState) : base(startState, endState) { }
     }
 }
