@@ -13,7 +13,6 @@ namespace EntityComponentState
         public virtual SerializableListEntity despawns { get; } = new SerializableListEntity();
 
         public abstract IEnumerable<Type> componentTypes { get; }
-        public abstract Type stateType { get; }
         private Dictionary<Type, List<Component>> changes = new Dictionary<Type, List<Component>>();
 
         public DeltaState()

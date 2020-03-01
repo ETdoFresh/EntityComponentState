@@ -37,6 +37,7 @@ namespace EntityComponentState
 
         public static int Min(int val1, int val2) => MathSys.Min(val1, val2);
 
+        public static float Round(float value) => (float)MathSys.Round(value);
         public static int RoundToInt(float value) => (int)MathSys.Round(value);
     }
 }

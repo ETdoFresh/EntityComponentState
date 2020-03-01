@@ -10,7 +10,6 @@ namespace EntityComponentState
 
         public virtual SerializableListEntity entities { get; } = new SerializableListEntity();
         public abstract IEnumerable<Type> componentTypes { get; }
-        public abstract Type deltaType { get; }
 
         public virtual void Clear()
         {

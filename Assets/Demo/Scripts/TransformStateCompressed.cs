@@ -53,13 +53,11 @@ public class TransformStateCompressed : StateMB
         };
 
         public override IEnumerable<Type> componentTypes => TYPES;
-        public override Type deltaType => typeof(TransformDeltaState);
     }
 
     public class TransformDeltaState : CompressedDeltaState
     {
         public override IEnumerable<Type> componentTypes => TransformState.TYPES;
-        public override Type stateType => typeof(TransformState);
 
         public TransformDeltaState() { }
         public TransformDeltaState(State startState, State endState) : base(startState, endState) { }
