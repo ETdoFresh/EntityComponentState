@@ -27,7 +27,8 @@ namespace EntityComponentState
 
         public override string ToString()
         {
-            var output = $"State [Tick: {tick}]\r\n";
+            var output = $"State\r\n";
+            output += $"  Tick: {tick}\r\n";
             foreach (var componentType in componentTypes)
             {
                 output += $"  {componentType.Name}\r\n";

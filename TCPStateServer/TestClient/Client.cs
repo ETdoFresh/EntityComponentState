@@ -12,6 +12,8 @@ namespace TestClient
 {
     class Client
     {
+        private static int simulatedTick;
+
         static void Main(string[] args)
         {
             var host = "localhost";
@@ -21,10 +23,27 @@ namespace TestClient
             client.Open();
 
             string input;
-            var state = new TransformState();
             while ((input = Console.ReadLine()).ToLower() != "quit")
             {
-                client.Send(state.ToBytes().ToArray());
+                if (input.ToLower() == "state")
+                {
+                    var state = new TransformState();
+                    state.tick = simulatedTick++;
+                    var packet = new List<byte>();
+                    packet.Add((byte)CommandEnum.StateUpdate);
+                    packet.AddRange(state.ToBytes());
+                    client.Send(packet.ToArray());
+                }
+                if (input.ToLower() == "deltastate")
+                {
+                    var deltaState = new TransformDeltaState();
+                    deltaState.startStateTick = simulatedTick - 1;
+                    deltaState.endStateTick = simulatedTick++;
+                    var packet = new List<byte>();
+                    packet.Add((byte)CommandEnum.DeltaStateUpdate);
+                    packet.AddRange(deltaState.ToBytes());
+                    client.Send(packet.ToArray());
+                }
             }
             client.Close();
         }

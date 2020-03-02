@@ -99,28 +99,32 @@ namespace EntityComponentState
 
         public override string ToString()
         {
-            var output = $"State [Start Tick: {startStateTick} End Tick: {endStateTick}] Entity Count: {entityCount}\r\n";
+            var output = $"Delta State\r\n";
+            output += $"  Start State Tick: {startStateTick}\r\n";
+            output += $"  End State Tick: {endStateTick}\r\n";
+            output += $"  Entity Count: {entityCount.value}\r\n";
 
-            output += $"\r\nSpawns [Count: {spawns.Count()}]\r\n";
+            output += $"  Spawns [Count: {spawns.Count()}]\r\n";
+            if (spawns.Count > 0) output += "    ";
             foreach (var entity in spawns)
                 output += $"{entity.id} ";
+            if (spawns.Count > 0) output += "\r\n";
 
-            output += $"\r\nDespawns [Count: {despawns.Count()}]\r\n";
+            output += $"  Despawns [Count: {despawns.Count()}]\r\n";
+            if (despawns.Count > 0) output += "    ";
             foreach (var entity in despawns)
                 output += $"{entity.id} ";
-
-            output += "\r\n";
+            if (despawns.Count > 0) output += "\r\n";
 
             foreach (var componentType in componentTypes)
             {
-                output += $"  ----{componentType.Name}----\r\n";
+                output += $"  {componentType.Name}\r\n";
                 foreach (var change in changes[componentType])
                     if (change is null)
                         output += $"    SKIP\r\n";
                     else
                         output += $"    {change}\r\n";
             }
-
             return output;
         }
 

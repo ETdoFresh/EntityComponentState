@@ -12,10 +12,12 @@ namespace TCPStateServer
     {
         private static TCPServer server;
         private static List<Socket> clients = new List<Socket>();
+        private static StateHistory<TransformState> stateHistory = new StateHistory<TransformState>();
 
         static void Main(string[] args)
         {
-            var stateHistory = new StateHistory<TransformState>();
+            stateHistory.Add(new TransformState()); // Empty start state
+
             var port = 9999;
             server = new TCPServer("localhost", 9999);
             server.OnOpen += OnClientConnected;
@@ -41,9 +43,47 @@ namespace TCPStateServer
 
         private static void OnReceiveMessage(object sender, Message<Socket> e)
         {
-            var state = new TransformState();
-            state.FromBytes(new ByteQueue(e.bytes));
-            Console.WriteLine($"TCPClient {e.client.Handle}: {state}");
+            var bytes = new ByteQueue(e.bytes);
+            var command = (CommandEnum)bytes.GetByte();
+            if (command == CommandEnum.Input)
+            {
+                // Receive Input:
+            }
+            if (command == CommandEnum.StateUpdate)
+            {
+                var state = new TransformState();
+                state.FromBytes(bytes);
+                Console.WriteLine($"TCPClient {e.client.Handle}: {state}");
+
+                var existingState = stateHistory.GetState(state.tick);
+                if (existingState != null)
+                {
+                    existingState.Clear();
+                    existingState.entities.AddRange(state.entities);
+                }
+                else
+                    stateHistory.Add(state);
+            }
+            if (command == CommandEnum.DeltaStateUpdate)
+            {
+                var deltaState = new TransformDeltaState();
+                deltaState.FromBytes(bytes);
+                Console.WriteLine($"TCPClient {e.client.Handle}: {deltaState}");
+                var startState = stateHistory.GetState(deltaState.startStateTick);
+                if (startState != null)
+                {
+                    var endState = (TransformState)deltaState.GenerateEndState(startState);
+                    Console.WriteLine($"End State Generated: {endState}");
+                    var existingState = stateHistory.GetState(endState.tick);
+                    if (existingState != null)
+                    {
+                        existingState.Clear();
+                        existingState.entities.AddRange(endState.entities);
+                    }
+                    else
+                        stateHistory.Add(endState);
+                }
+            }
         }
     }
 }
