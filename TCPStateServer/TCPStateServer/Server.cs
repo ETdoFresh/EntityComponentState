@@ -62,7 +62,11 @@ namespace TCPStateServer
                     existingState.entities.AddRange(state.entities);
                 }
                 else
+                {
                     stateHistory.Add(state);
+                    foreach (var client in clients)
+                        server.Send(client, Packet.Create(CommandEnum.StateUpdate, state.ToBytes()));
+                }
             }
             if (command == CommandEnum.DeltaStateUpdate)
             {
@@ -81,7 +85,11 @@ namespace TCPStateServer
                         existingState.entities.AddRange(endState.entities);
                     }
                     else
+                    {
                         stateHistory.Add(endState);
+                        foreach (var client in clients)
+                            server.Send(client, Packet.Create(CommandEnum.StateUpdate, endState.ToBytes()));
+                    }
                 }
             }
         }

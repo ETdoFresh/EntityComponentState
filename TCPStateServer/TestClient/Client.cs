@@ -20,6 +20,7 @@ namespace TestClient
             var port = 9999;
             Console.WriteLine($"This is an example TCP Client. Press any key to connect to tcp://{host}:{port}");
             var client = new TCPClient(host, port);
+            client.OnMessage += OnReceive;
             client.Open();
 
             string input;
@@ -29,23 +30,29 @@ namespace TestClient
                 {
                     var state = new TransformState();
                     state.tick = simulatedTick++;
-                    var packet = new List<byte>();
-                    packet.Add((byte)CommandEnum.StateUpdate);
-                    packet.AddRange(state.ToBytes());
-                    client.Send(packet.ToArray());
+                    client.Send(Packet.Create(CommandEnum.StateUpdate, state.ToBytes()));
                 }
                 if (input.ToLower() == "deltastate")
                 {
                     var deltaState = new TransformDeltaState();
                     deltaState.startStateTick = simulatedTick - 1;
                     deltaState.endStateTick = simulatedTick++;
-                    var packet = new List<byte>();
-                    packet.Add((byte)CommandEnum.DeltaStateUpdate);
-                    packet.AddRange(deltaState.ToBytes());
-                    client.Send(packet.ToArray());
+                    client.Send(Packet.Create(CommandEnum.DeltaStateUpdate, deltaState.ToBytes()));
                 }
             }
             client.Close();
+        }
+
+        private static void OnReceive(object sender, Message e)
+        {
+            var bytes = new ByteQueue(e.bytes);
+            var command = (CommandEnum)bytes.GetByte();
+            if (command == CommandEnum.StateUpdate)
+            {
+                var state = new TransformState();
+                state.FromBytes(bytes);
+                Console.WriteLine($"TCPServer: {state}");
+            }
         }
     }
 }
